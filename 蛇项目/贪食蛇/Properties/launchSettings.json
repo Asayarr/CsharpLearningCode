@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "\u8d2a\u98df\u86c7": {
+      "commandName": "Project",
+      "debugEngines": "managed"
+    }
+  }
+}
