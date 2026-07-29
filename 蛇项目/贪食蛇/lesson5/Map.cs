@@ -7,7 +7,7 @@ namespace 贪食蛇
 {
     class Map:IDraw
     {
-        private Wall[] walls;
+        public Wall[] walls;
 
         public Map() 
         {

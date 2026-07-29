@@ -10,6 +10,7 @@ namespace 贪食蛇
     {
         Map map;
         Snake snake;
+        Food food;
 
         int updateIndex = 0;
 
@@ -17,6 +18,7 @@ namespace 贪食蛇
         { 
             map = new Map();
             snake = new Snake(40, 10);
+            food = new Food(snake);
         }
         public void Update()
         {
@@ -24,9 +26,19 @@ namespace 贪食蛇
             if (updateIndex % 4444 == 0) 
             {
                 map.Draw();
+                food.Draw();
 
                 snake.Move();
                 snake.Draw();
+
+                //检测是否撞墙
+                if (snake.CheakEnd(map))
+                {
+                    Game.ChangeScene(E_SceneType.End);
+                }
+
+                //吃食物
+                snake.CheakEatFood(food);
 
                 updateIndex = 0;
 
