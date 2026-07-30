@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Porblem3/Porblem3.csproj" Id="9c66a5e3-af1c-4122-87b3-0f3b73b3973e" />
+  <Project Path="Problem1/Problem1.csproj" />
+  <Project Path="Problem3/Problem3.csproj" Id="0f4f92ee-1901-49a8-94d4-f704ba3f607e" />
+  <Project Path="Problem4/Problem4.csproj" Id="b89f30da-354f-4296-a2a4-1ef8000c25de" />
+</Solution>
