@@ -3,4 +3,6 @@
   <Project Path="Problem1/Problem1.csproj" />
   <Project Path="Problem3/Problem3.csproj" Id="0f4f92ee-1901-49a8-94d4-f704ba3f607e" />
   <Project Path="Problem4/Problem4.csproj" Id="b89f30da-354f-4296-a2a4-1ef8000c25de" />
+  <Project Path="Problem5/Problem5.csproj" Id="2daa50e2-97c2-46c6-a880-cfa68ea25950" />
+  <Project Path="Problem6/Problem6.csproj" Id="38749e20-38af-4d5c-9264-31e966d1ba42" />
 </Solution>
