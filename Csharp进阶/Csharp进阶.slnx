@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Arraylist/Arraylist.csproj" />
+  <Project Path="HashTable/HashTable.csproj" Id="8db42196-f3a2-4b79-86a4-677623718b91" />
+  <Project Path="Queues/Queues.csproj" />
+  <Project Path="Stack/Stack.csproj" />
+  <Project Path="Stacks/Stacks.csproj" />
+</Solution>

@@ -1,13 +1,102 @@
-# 忽略 Visual Studio 生成的临时配置文件
+## .NET / Visual Studio / C# 项目忽略规则
+
+# ====== Visual Studio ======
 .vs/
-
-# 忽略项目编译生成的文件夹
-bin/
-obj/
-
-# 忽略用户特定的设置
+*.suo
 *.user
 *.userosscache
+*.sln.docstates
+*.userprefs
 
-# 忽略自动生成的备份文件
+# ====== 编译输出 ======
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.iobj
+*.ipdb
+# 但保留非编译生成的 DLL（如果有第三方依赖放在项目内）
+!**/packages/**/lib/*.dll
+
+# ====== NuGet ======
+*.nupkg
+**/[Pp]ackages/*
+# 例外：允许提交 packages 目录下的 repos.config / .targets
+!**/[Pp]ackages/repositories.config
+!**/[Pp]ackages/*.targets
+
+# ====== 发布 / 部署 ======
+*.pubxml.user
+*.publishproj
+[Pp]ublish/
+*.azurePubxml
+
+# ====== 测试结果 ======
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VisualState.xml
+TestResult.xml
+*.coverage
+*.coveragexml
+
+# ====== 代码覆盖率 / 分析 ======
+*.dotCover
+*.ncrunch*
+*.ncrunchsolution
+*.vsps
+*.vspx
+*.psess
+*.vsmdi
+
+# ====== JetBrains Rider ======
+.idea/
+*.sln.iml
+
+# ====== Visual Studio Code ======
+.vscode/
+*.code-workspace
+
+# ====== ReSharper ======
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# ====== 备份文件 ======
 *.backup
+*.bak
+*.orig
+*.tmp
+*~
+~$*
+
+# ====== 操作系统 ======
+# Windows
+Thumbs.db
+Desktop.ini
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+.directory
+.Trash-*
+
+# ====== 日志 ======
+*.log
+logs/
+
+# ====== 杂项 ======
+*.cache
+*.dbmdl
+*.jfm
+*.pfx
+*.snk
+Generated_Code/
+*.nupkg.sha512

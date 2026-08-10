@@ -1571,3 +1571,190 @@ Point p2 = new Point { X = 3, Y = 4 };
 Point p3 = p1 + p2;     // X=4, Y=6
 Point p4 = p1 + 5;      // X=6, Y=7
 ```
+
+---
+
+## 九、集合（System.Collections）
+
+集合类位于 `System.Collections` 命名空间（需 `using System.Collections;`）。这些是非泛型集合，可以存放**任意类型**的元素（内部存 `object`），所以取出来时要拆箱/强转。
+
+### 9.1 ArrayList（可变数组）
+
+解决了普通数组**长度固定**的问题：可以动态增删，长度自动变化。
+
+```csharp
+using System.Collections;
+
+ArrayList array = new ArrayList();
+
+// 增 —— 可以放任意类型
+array.Add(1);
+array.Add("123");
+array.Add(true);
+array.Add(new Test());       // 自定义类也可以
+
+ArrayList array2 = new ArrayList();
+array2.Add(123);
+array.AddRange(array2);      // 把另一个集合整体追加进来
+
+array.Insert(1, "插入的元素"); // 指定位置插入
+
+// 删
+array.Remove(1);             // 从头删除第一个值为1的元素
+array.RemoveAt(2);           // 删除指定索引的元素
+//array.Clear();             // 清空所有元素
+
+// 查
+Console.WriteLine(array[0]);          // 索引访问
+array.Contains("123");                // 是否包含某元素 → bool
+int index = array.IndexOf(true);      // 正向查找，返回索引；找不到返回 -1
+int lastIndex = array.LastIndexOf(true); // 反向查找
+
+// 改
+array[0] = "999";            // 索引赋值
+
+// 遍历
+for (int i = 0; i < array.Count; i++)   // Count = 元素个数（不是 Length）
+    Console.WriteLine(array[i]);
+
+foreach (object item in array)          // 遍历出来都是 object
+    Console.WriteLine(item);
+```
+
+> 与数组对比：数组用 `Length`，ArrayList 用 `Count`。ArrayList 存的是 `object`，取出使用时可能需要类型转换。
+
+### 9.2 Hashtable（哈希表）
+
+以**键值对（key-value）**形式存储，类似字典。**key 唯一，value 可以重复**。
+
+```csharp
+using System.Collections;
+
+Hashtable hashtable = new Hashtable();
+
+// 增 —— key 和 value 都可以是任意类型
+hashtable.Add(1, "123");
+hashtable.Add("123", 2);
+hashtable.Add(true, false);
+
+// 删
+hashtable.Remove(1);         // 只能通过 key 删除
+hashtable.Remove(2);         // 删除不存在的 key 不会报错
+hashtable.Clear();           // 清空
+
+// 查 —— 通过 key 取值，找不到返回 null
+Console.WriteLine(hashtable[1]);
+Console.WriteLine(hashtable[4]);        // null
+
+hashtable.Contains(1);                 // 按 key 判断是否存在
+hashtable.ContainsKey(2);              // 等价写法
+hashtable.ContainsValue("123");        // 按 value 判断是否存在
+
+// 改 —— 只能改 value，不能改 key
+hashtable[1] = 100.5f;
+
+// 遍历
+Console.WriteLine(hashtable.Count);    // 键值对个数
+
+// 1. 遍历 key
+foreach (object key in hashtable.Keys)
+    Console.WriteLine("键:" + key + " 值:" + hashtable[key]);
+
+// 2. 遍历 value
+foreach (object value in hashtable.Values)
+    Console.WriteLine("值:" + value);
+
+// 3. 遍历键值对（DictionaryEntry 是键值对结构体）
+foreach (DictionaryEntry item in hashtable)
+    Console.WriteLine("键:" + item.Key + ", 值:" + item.Value);
+
+// 4. 迭代器遍历
+IDictionaryEnumerator myEnumerator = hashtable.GetEnumerator();
+while (myEnumerator.MoveNext())
+    Console.WriteLine("键:" + myEnumerator.Key + ", 值:" + myEnumerator.Value);
+```
+
+### 9.3 Queue（队列）
+
+**先进先出（FIFO）**。就像排队：先来的先走。只能从队首取、队尾进。
+
+```csharp
+using System.Collections;
+
+Queue queue = new Queue();
+
+// 增 —— 入队（队尾）
+queue.Enqueue(1);
+queue.Enqueue("123");
+queue.Enqueue(1.4f);
+
+// 取 —— 出队（队首），取出后元素被移除
+object v = queue.Dequeue();
+Console.WriteLine(v);        // 1
+
+// 查
+v = queue.Peek();            // 只看队首，不移除
+queue.Contains("123");       // 是否包含某元素
+
+// 改
+// 队列不支持直接修改元素，要先 Dequeue 出来，改完再 Enqueue 回去
+queue.Clear();               // 清空
+
+// 遍历
+foreach (object item in queue)
+    Console.WriteLine(item);
+
+object[] array = queue.ToArray();   // 转成数组
+
+while (queue.Count > 0)             // 边取边删，直到取空
+    Console.WriteLine(queue.Dequeue());
+```
+
+> 队列只关心两端的操作，中间的元素不能直接访问。
+
+### 9.4 Stack（栈）
+
+**后进先出（LIFO）**。就像叠盘子：最后放的先拿。只能从栈顶存取。
+
+```csharp
+using System.Collections;
+
+Stack stack = new Stack();
+
+// 增 —— 入栈（压到栈顶）
+stack.Push(1);
+stack.Push("123");
+stack.Push(true);
+
+// 取 —— 出栈（弹栈顶），取出后元素被移除
+object v = stack.Pop();
+Console.WriteLine(v);        // true（最后放的先出来）
+
+// 查
+v = stack.Peek();            // 只看栈顶，不移除
+stack.Contains("123");       // 是否包含某元素
+
+// 改
+// 栈中的元素无法直接修改，也没有索引器，不能用 for 循环遍历
+stack.Clear();               // 清空
+
+// 遍历
+foreach (object item in stack)       // foreach 从栈顶开始
+    Console.WriteLine(item);
+
+object[] arr = stack.ToArray();      // 转成数组
+
+while (stack.Count > 0)
+    Console.WriteLine(stack.Pop());
+```
+
+### 9.5 四者对比
+
+| 集合 | 结构 | 顺序 | 增删位置 | 特点 |
+|------|------|------|----------|------|
+| `ArrayList` | 动态数组 | 插入顺序 | 任意位置 | 可动态增删、可索引访问 |
+| `Hashtable` | 键值对 | 无序 | 按 key | key 唯一，查找快 |
+| `Queue` | 队列 | FIFO | 队尾进、队首出 | 先进先出 |
+| `Stack` | 栈 | LIFO | 栈顶进出 | 后进先出 |
+
+> 这些是非泛型集合，存取的是 `object`（有装箱/拆箱开销）。泛型版本 `List<T>`、`Dictionary<K,V>`、`Queue<T>`、`Stack<T>` 类型安全且性能更好，是日常开发的首选。
