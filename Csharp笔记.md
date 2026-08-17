@@ -63,6 +63,15 @@ int longSize = sizeof(long);     // 8
 | `float` | 4 | 约7位精度 |
 | `double` | 8 | 约15位精度 |
 
+**浮点数精度陷阱**：浮点数以二进制存储，十进制小数（如 0.1）无法精确表示，运算会累积误差。
+
+```csharp
+double x = 1.0 - 0.1 - 0.1 - 0.1 - 0.1 - 0.1;
+Console.WriteLine(x);   // 0.5000000000000001（不是精确的 0.5）
+```
+
+> 涉及金额等需要精确计算的场景，应使用 `decimal` 类型（精度更高，无此类误差）。
+
 ### 1.4 常量
 
 `const` 声明的变量必须在定义时初始化，之后不可修改。
@@ -93,9 +102,9 @@ str = @"你\t好";   // 逐字字符串，\t 被当作普通字符输出
 Console.WriteLine(str);  // 输出：你\t好（不会变成制表符）
 ```
 
-### 1.6 隐式类型转换
+### 1.6 类型转换
 
-大范围类型可以隐式接收小范围类型的值（自动安全转换）。转换方向：`long` ← `int` ← `short` ← `sbyte`
+**隐式转换**：大范围类型可以隐式接收小范围类型的值（自动安全转换）。转换方向：`long` ← `int` ← `short` ← `sbyte`
 
 ```csharp
 long l = 1;
@@ -107,6 +116,35 @@ l = i;   // int → long 隐式转换 OK
 i = s;   // short → int 隐式转换 OK
 s = sb;  // sbyte → short 隐式转换 OK
 ```
+
+**显式转换（强制转换）**：大范围转小范围可能溢出或丢精度，必须用 `(类型)` 强转，风险由程序员承担。
+
+```csharp
+// 强制转换 —— 小范围装大范围
+int i = 100;
+short s = (short)i;        // OK，100 在 short 范围内
+
+long l = 3000000000;       // 超过 int 范围
+int j = (int)l;            // 溢出！结果不确定，需谨慎
+
+// 浮点 → 整数：直接截断小数部分（不四舍五入）
+double d = 3.99;
+int k = (int)d;            // 3（丢弃小数）
+```
+
+**字符串与数值互转：**
+
+```csharp
+// string → 数值
+int a = int.Parse("123");              // 解析失败会抛异常
+float b = float.Parse("3.14");
+
+// 数值 → string
+string s1 = 123.ToString();
+string s2 = 3.14f.ToString();
+```
+
+> 三种方式对比：隐式转换自动安全；显式转换 `(类型)` 可能溢出需谨慎；`int.Parse` / `Convert.ToInt32` 处理字符串转数值。
 
 ---
 
@@ -848,7 +886,7 @@ MyGame.Game.Image img = new MyGame.Game.Image();
 
 ## 六、面向对象编程
 
-### 5.1 类与对象、成员变量、访问修饰符
+### 6.1 类与对象、成员变量、访问修饰符
 
 类是对象的模板，通过 `new` 创建实例。成员变量（字段）存储在类的实例中。
 
@@ -872,7 +910,7 @@ class Person
 }
 ```
 
-### 5.2 构造函数与析构函数
+### 6.2 构造函数与析构函数
 
 构造函数在 `new` 创建对象时自动调用，用于初始化对象。构造函数名与类名相同，无返回类型。
 
@@ -913,7 +951,7 @@ Person p = new Person();
 p = null;   // 原对象成为垃圾，等待 GC 回收
 ```
 
-### 5.3 成员属性
+### 6.3 成员属性
 
 属性是字段的封装，通过 `get`/`set` 访问器控制读写，可以在访问时添加验证或处理逻辑。
 
@@ -951,7 +989,7 @@ public int Age { get; private set; }           // 外部只读
 public float Height { get; private set; }      // 外部只读
 ```
 
-### 5.4 静态成员与静态类
+### 6.4 静态成员与静态类
 
 `static` 成员属于类本身，不属于任何实例。通过 `类名.成员` 访问。
 
@@ -989,7 +1027,7 @@ static class StaticClass
 
 > 普通类也可以有静态构造函数：在首次实例化或访问静态成员时自动调用一次。
 
-### 5.5 索引器
+### 6.5 索引器
 
 让对象能像数组一样用 `[]` 语法访问数据。
 
@@ -1037,7 +1075,7 @@ Console.WriteLine(p[0]);     // 调用 int 索引器 get
 Console.WriteLine(p["name"]); // 调用 string 索引器 get
 ```
 
-### 5.6 继承基本规则
+### 6.6 继承基本规则
 
 C# 只支持**单继承**（一个类只能继承一个父类），但可以**多层继承**。子类获得父类所有 `public` 和 `protected` 成员。
 
@@ -1075,7 +1113,7 @@ class RapTeacher : TeachingTeacher
 }
 ```
 
-### 5.7 继承中的构造函数
+### 6.7 继承中的构造函数
 
 创建子类对象时，构造函数从顶层父类开始逐级向下执行。如果父类没有无参构造函数，子类必须用 `base()` 显式调用父类构造函数。
 
@@ -1121,7 +1159,7 @@ class Son : Father
 }
 ```
 
-### 5.8 密封类
+### 6.8 密封类
 
 `sealed` 修饰的类**不能被继承**。
 
@@ -1131,7 +1169,7 @@ sealed class Father { }
 // class Son : Father { }   // 编译错误：无法继承密封类
 ```
 
-### 5.9 抽象类与抽象方法
+### 6.9 抽象类与抽象方法
 
 `abstract` 类不能实例化，只能被继承。抽象方法没有方法体，子类必须用 `override` 实现。
 
@@ -1161,7 +1199,7 @@ Fruits f = new Apple();      // 正确：通过父类引用子类对象
 - 不能是 `private`
 - 没有方法体（只有声明）
 
-### 5.10 多态
+### 6.10 多态
 
 多态允许父类引用调用子类重写的方法，运行时决定具体调用哪个版本。
 
@@ -1209,7 +1247,7 @@ f.SpeakName();            // 输出："Father的方法"（父类引用调父类�
 
 > `new` 只是隐藏，不是覆盖。父类引用仍然调用父类方法。只有 `virtual + override` 才是真正的运行时多态。
 
-### 5.11 接口
+### 6.11 接口
 
 接口声明了一组功能契约，实现接口的类必须实现其中所有成员。接口不能有成员变量和方法实现。
 
@@ -1275,7 +1313,7 @@ Player p = new Player();
 
 > 显式实现用于两个接口有同名方法时区分调用。调用时必须转换为对应接口类型。
 
-### 5.12 抽象类与接口的区别
+### 6.12 抽象类与接口的区别
 
 | | 抽象类（`abstract class`） | 接口（`interface`） |
 |---|------|------|
@@ -1321,7 +1359,7 @@ class Duck : Animal, IFly, ISwim
 
 > 选择原则：当多个类共享代码和字段 → 抽象类；当多个不相关的类需要相同行为 → 接口。
 
-### 5.13 内部类与分部类
+### 6.13 内部类与分部类
 
 **内部类（嵌套类）**：类定义在另一个类的内部。用 `OuterClass.InnerClass` 访问。
 
@@ -1359,7 +1397,7 @@ partial class Student
 }
 ```
 
-### 5.14 密封方法
+### 6.14 密封方法
 
 `sealed override` 阻止子类进一步重写已被 `override` 的方法。
 
@@ -1395,7 +1433,7 @@ class WhitePerson : Person
 
 ## 七、设计原则
 
-### 6.1 里氏替换原则（LSP）
+### 7.1 里氏替换原则（LSP）
 
 核心思想：**父类容器可以装子类对象**，子类可以替换父类出现的位置，且程序行为不变。
 
@@ -1420,7 +1458,7 @@ if (player is Player)
 }
 ```
 
-### 6.2 万物之父与装箱拆箱
+### 7.2 万物之父与装箱拆箱
 
 `object` 是所有类型的基类（C# 中一切皆派生自 `object`）。
 
@@ -1457,7 +1495,7 @@ if (o is Son)
 }
 ```
 
-### 6.3 万物之父中的方法
+### 7.3 万物之父中的方法
 
 `object` 类提供了三类方法：静态方法、成员方法、虚方法。
 
@@ -1542,7 +1580,7 @@ Console.WriteLine(t);          // 输出：原神牛逼（隐式调用 ToString(
 
 ## 八、高级特性
 
-### 7.1 运算符重载
+### 8.1 运算符重载
 
 通过 `operator` 关键字为自定义类型定义运算符行为。必须是 `public static` 方法。
 
@@ -1758,3 +1796,250 @@ while (stack.Count > 0)
 | `Stack` | 栈 | LIFO | 栈顶进出 | 后进先出 |
 
 > 这些是非泛型集合，存取的是 `object`（有装箱/拆箱开销）。泛型版本 `List<T>`、`Dictionary<K,V>`、`Queue<T>`、`Stack<T>` 类型安全且性能更好，是日常开发的首选。
+
+---
+
+## 十、泛型
+
+泛型是**类型参数化**的机制：在定义类/方法/接口时先用占位符 `T` 表示类型，使用时再指定具体类型。好处是**类型安全**（编译期检查）+ **代码复用**（一份代码适配多种类型）。
+
+### 10.1 泛型类
+
+```csharp
+class TestClass<T>
+{
+    public T value;
+}
+
+// 使用 —— 实例化时指定具体类型
+TestClass<int> t = new TestClass<int>();
+t.value = 1;
+
+TestClass<string> t2 = new TestClass<string>();
+t2.value = "Hello";
+```
+
+**多个类型参数**：
+
+```csharp
+class TestClass2<T1, T2, Z, M, JJ, KK>
+{
+    public T1 value1;
+    public T2 value2;
+    public Z value3;
+    // ...
+}
+
+TestClass2<int, string, double, float, TestClass<int>, short> t3 =
+    new TestClass2<int, string, double, float, TestClass<int>, short>();
+```
+
+### 10.2 泛型接口
+
+```csharp
+interface ITestInterface<T>
+{
+    T Value { get; set; }
+}
+
+// 实现时指定具体类型
+class Test : ITestInterface<int>
+{
+    public int Value { get; set; }
+}
+```
+
+### 10.3 泛型方法
+
+**普通类中的泛型方法**：方法自己带类型参数。
+
+```csharp
+class Test2
+{
+    public void TestFun<T>(T value)
+    {
+        Console.WriteLine(value);
+    }
+
+    public T TestFun<T>(string v)      // 泛型返回值
+    {
+        return default(T);             // default(T)：T 的默认值
+    }
+
+    public void TestFun<T1, T2>(T1 v1, T2 v2)  // 多个类型参数
+    { }
+}
+```
+
+**泛型类中的泛型方法**：
+
+```csharp
+class Test2<T>
+{
+    public T value;
+
+    // 这不是泛型方法，是泛型类中的普通方法
+    // T 在实例化类时已确定，调用时不能再指定
+    public void TestFun(T t) { }
+
+    // 这才是泛型方法 —— K 由方法调用时指定
+    public void TestFun<K>(K k) { }
+}
+
+Test2<int> tt = new Test2<int>();
+tt.TestFun(1);                  // 用类的 T = int
+tt.TestFun<string>("123");      // 方法自己的 K = string
+```
+
+### 10.4 泛型的作用
+
+解决了非泛型集合（如 ArrayList）的两个问题：**类型不安全**（什么都能塞）和**装箱拆箱开销**。用泛型手写一个类型安全的动态数组：
+
+```csharp
+class Arraylist<T>
+{
+    private T[] array;
+    private int count;
+
+    public Arraylist()
+    {
+        array = new T[10];
+        count = 0;
+    }
+
+    public void Add(T item)
+    {
+        if (count >= array.Length)
+            Array.Resize(ref array, array.Length * 2);  // 自动扩容
+        array[count++] = item;
+    }
+
+    public T Get(int index)
+    {
+        if (index < 0 || index >= count)
+            throw new IndexOutOfRangeException();
+        return array[index];
+    }
+
+    public int Count { get { return count; } }
+}
+```
+
+> 这就是 `List<T>` 的实现思路。泛型让集合在**编译期**就确定元素类型，存取不再需要拆箱，也比 ArrayList 更快。
+
+### 10.5 泛型约束
+
+泛型约束用 `where` 关键字**限制类型参数 T 的取值**，让泛型代码能安全地使用特定类型才有的功能。
+
+**约束种类：**
+
+| 约束写法 | 含义 |
+|----------|------|
+| `where T : struct` | T 必须是**值类型**（int、float、bool、struct 等） |
+| `where T : class` | T 必须是**引用类型**（string、class、数组等） |
+| `where T : new()` | T 必须有无参构造函数（可 `new T()`） |
+| `where T : <基类名>` | T 必须继承自指定基类 |
+| `where T : <接口名>` | T 必须实现指定接口 |
+| `where T : U` | T 必须是 U 的派生类或实现 U 接口 |
+
+**各约束示例：**
+
+```csharp
+// 值类型约束
+class Test1<T> where T : struct
+{
+    public T Value;
+    public void TestFun<K>(K v) where K : struct { }
+}
+
+// 引用类型约束
+class Test2<T> where T : class
+{
+    public T Value;
+    public void TestFun<K>(K v) where K : class { }
+}
+
+// 无参构造函数约束 —— 可以安全 new T()
+class Test3<T> where T : new()
+{
+    public T Value = new T();
+}
+```
+
+```csharp
+class Test1 { }                  // 基类
+class Test2
+{
+    public Test2(int a) { }      // 只有有参构造
+}
+class Test3 : Test1 { }          // 继承 Test1
+
+// 基类约束 —— T 必须是 Test1 或其派生类
+class Test4<T> where T : Test1
+{
+    public T Value;
+}
+
+Test4<Test1> t4 = new Test4<Test1>();
+Test4<Test3> tt4 = new Test4<Test3>();   // Test3 继承 Test1，可以
+//Test4<Test2> t4 = new Test4<Test2>();  // 不行：Test2 与 Test1 无关
+```
+
+```csharp
+interface IFly { }
+interface IMove : IFly { }       // 接口继承接口
+class Test4 : IFly { }           // 实现 IFly
+
+// 接口约束 —— T 必须实现 IFly
+class Test5<T> where T : IFly
+{
+    public T Value;
+}
+
+Test5<IFly> t5 = new Test5<IFly>();
+t5.Value = new Test4();          // Test4 实现了 IFly，可以
+Test5<IMove> tt5 = new Test5<IMove>();
+```
+
+```csharp
+// 另一个泛型参数约束 —— T 必须是 U 的派生类或实现 U 接口
+class Test6<T, U> where T : U
+{
+    public T Value;
+}
+
+Test6<IMove, IFly> t6 = new Test6<IMove, IFly>();
+// IMove 继承自 IFly，满足 T : U
+```
+
+**约束组合与多参数约束：**
+
+```csharp
+// 多个约束组合（用逗号分隔）
+class Test7<T> where T : class, new()   // 必须是引用类型 + 有无参构造
+{ }
+
+// 多个类型参数各自有约束
+class Test8<T, K>
+    where T : class, new()
+    where K : struct
+{ }
+```
+
+**约束使用场景：**
+
+```csharp
+// 错误示范：不约束时不能用 new T()
+class Bad<T>
+{
+    //public T t = new T();  // 编译错误：无法确定 T 有无无参构造
+}
+
+// 正确：加上 new() 约束后可以
+class Good<T> where T : new()
+{
+    public T t = new T();    // OK
+}
+```
+
+> **记忆口诀**：`struct` 管值类型，`class` 管引用类型，`new()` 管能构造，基类/接口管继承关系。约束让泛型代码从"什么都能装"变成"符合条件的才能装"。
