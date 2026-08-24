@@ -32,13 +32,13 @@ namespace 贪食蛇
                 snake.Draw();
 
                 //检测是否撞墙
-                if (snake.CheakEnd(map))
+                if (snake.CheckEnd(map))
                 {
                     Game.ChangeScene(E_SceneType.End);
                 }
 
                 //吃食物
-                snake.CheakEatFood(food);
+                snake.CheckEatFood(food);
 
                 updateIndex = 0;
 

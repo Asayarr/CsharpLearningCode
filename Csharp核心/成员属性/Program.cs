@@ -69,7 +69,7 @@ namespace 成员属性
         static void Main(string[] args)
         {
             Person p =new Person();
-            p.Name = "kizoverlxrd";//set
+            p.Name = "王五";//set
             Console.WriteLine(p.Name);//get
             p.Money = 1000;
             Console.WriteLine(p.Money);

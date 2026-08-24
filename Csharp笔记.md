@@ -145,6 +145,17 @@ string s2 = 3.14f.ToString();
 ```
 
 > 三种方式对比：隐式转换自动安全；显式转换 `(类型)` 可能溢出需谨慎；`int.Parse` / `Convert.ToInt32` 处理字符串转数值。
+### 1.7 随机数
+
+使用 `Random` 类生成随机数。`Next(max)` 返回 `[0, max)` 范围内的整数。
+
+```csharp
+Random r = new Random();
+int i = r.Next(20);      // 0 到 19 之间的随机整数
+Console.WriteLine(i);
+int damage = r.Next(5, 15);  // 5 到 14 之间
+```
+
 
 ---
 
@@ -236,15 +247,15 @@ Console.WriteLine(c);
 **if-else：**
 
 ```csharp
-Console.WriteLine("你喜欢的说唱歌手是谁");
+Console.WriteLine("请输入你的名字");
 string str = Console.ReadLine();
-if (str != null && str.Equals("Asen", StringComparison.OrdinalIgnoreCase))
+if (str != null && str.Equals("张三", StringComparison.OrdinalIgnoreCase))
 {
-    Console.WriteLine("阿里嘎多");
+    Console.WriteLine("你好，管理员");
 }
 else
 {
-    Console.WriteLine("感觉不如kiZz");
+    Console.WriteLine("你好，访客");
 }
 ```
 
@@ -326,7 +337,7 @@ string str = string.Format("迎面走来的{0}让{1}如此心动，这种感觉{
 Console.WriteLine(str);
 
 // Console.WriteLine 也支持直接使用占位符
-Console.WriteLine("我叫{0}，今年{1}岁", "kiZz", 18);
+Console.WriteLine("我叫{0}，今年{1}岁", "李四", 18);
 ```
 
 **索引访问与遍历：**
@@ -364,15 +375,15 @@ index = str.LastIndexOf("字符串");    // 12（最后一个匹配的位置）
 **移除与替换：**
 
 ```csharp
-string str = "我是kizkiz";
+string str = "我是张三张三";
 
 // 移除
-str = str.Remove(5);                 // "我是kiz"（移除索引5及之后）
-str = str.Remove(2, 3);              // "我是"（从索引2开始移除3个字符）
+str = str.Remove(4);                 // "我是张三"（移除索引4及之后）
+str = str.Remove(2, 2);              // "我是"（从索引2开始移除2个字符）
 
 // 替换
-str = "我是kizkiz";
-str = str.Replace("kiz", "张三");     // "我是张三张三"
+str = "我是张三张三";
+str = str.Replace("张三", "李四");     // "我是李四李四"
 ```
 
 **大小写转换：**
@@ -557,18 +568,7 @@ for (int j = 0; j < arr.Length; j++)
 }
 ```
 
-### 3.6 随机数
-
-使用 `Random` 类生成随机数。`Next(max)` 返回 `[0, max)` 范围内的整数。
-
-```csharp
-Random r = new Random();
-int i = r.Next(20);      // 0 到 19 之间的随机整数
-Console.WriteLine(i);
-int damage = r.Next(5, 15);  // 5 到 14 之间
-```
-
-### 3.7 枚举
+### 3.6 枚举
 
 `enum` 是一组命名的整数常量，默认从 0 开始递增。约定命名前缀为 `E_` 或 `E`。
 
@@ -613,7 +613,7 @@ switch (monsterType)
 }
 ```
 
-### 3.8 结构体
+### 3.7 结构体
 
 `struct` 是**值类型**（存储在栈上），适合表示轻量级数据对象。声明在 `namespace` 或 `class` 内部。
 
@@ -651,14 +651,14 @@ Student s1;
 s1.age = 10;
 s1.sex = false;
 s1.number = 1;
-s1.name = "kiZz";
+s1.name = "李四";
 s1.Speak();
 
 // 方式2：构造函数初始化
-Student s2 = new Student(18, true, 2, "kiZoverlxrd");
+Student s2 = new Student(18, true, 2, "王五");
 ```
 
-### 3.9 结构体与类的区别
+### 3.8 结构体与类的区别
 
 | | 结构体（`struct`） | 类（`class`） |
 |---|------|------|
@@ -725,8 +725,8 @@ void PrintInfo(string name, int age = 18)
 {
     Console.WriteLine("{0}，{1}岁", name, age);
 }
-PrintInfo("kiZz");           // age 使用默认值 18
-PrintInfo("kiZz", 25);       // age 指定为 25
+PrintInfo("李四");           // age 使用默认值 18
+PrintInfo("李四", 25);       // age 指定为 25
 
 // params 变长参数
 void TestFun(params int[] array)
@@ -902,7 +902,7 @@ MyGame.Game.Image img = new MyGame.Game.Image();
 ```csharp
 class Person
 {
-    public string name = "kiZz";     // 初始化的成员
+    public string name = "李四";     // 初始化的成员
     public int age;                  // 默认值 0
     public E_SexType sex;            // 默认值 第一个枚举值
     public Person girlfriend;        // 默认值 null
@@ -923,7 +923,7 @@ class Person
     // 无参构造函数
     public Person()
     {
-        name = "kiZz";
+        name = "李四";
         age = 18;
     }
 
@@ -1224,7 +1224,7 @@ class Player : GameObject
 }
 
 // 多态行为
-GameObject p = new Player("kiZz");
+GameObject p = new Player("李四");
 p.Atk();  // 输出：游戏对象攻击  +  玩家的攻击
           // 运行时调用的是 Player 的版本
 ```
@@ -1428,37 +1428,7 @@ class WhitePerson : Person
 }
 // WhitePerson 的子类无法再 override Eat 和 Speak
 ```
-
----
-
-## 七、设计原则
-
-### 7.1 里氏替换原则（LSP）
-
-核心思想：**父类容器可以装子类对象**，子类可以替换父类出现的位置，且程序行为不变。
-
-```csharp
-// 父类容器装子类对象
-GameObject player = new Player();
-GameObject monster = new Monster();
-GameObject boss = new Boss();
-
-// 多态数组
-GameObject[] objects = new GameObject[]
-{
-    new Player(),
-    new Monster(),
-    new Boss()
-};
-
-// 使用 is 类型检查 + as 安全转换
-if (player is Player)
-{
-    (player as Player).PlayerAtk();   // 调用子类特有方法
-}
-```
-
-### 7.2 万物之父与装箱拆箱
+### 6.15 万物之父与装箱拆箱
 
 `object` 是所有类型的基类（C# 中一切皆派生自 `object`）。
 
@@ -1495,7 +1465,7 @@ if (o is Son)
 }
 ```
 
-### 7.3 万物之父中的方法
+### 6.16 万物之父中的方法
 
 `object` 类提供了三类方法：静态方法、成员方法、虚方法。
 
@@ -1575,6 +1545,36 @@ class Test
 Test t = new Test();
 Console.WriteLine(t);          // 输出：原神牛逼（隐式调用 ToString()）
 ```
+
+---
+
+## 七、设计原则
+
+### 7.1 里氏替换原则（LSP）
+
+核心思想：**父类容器可以装子类对象**，子类可以替换父类出现的位置，且程序行为不变。
+
+```csharp
+// 父类容器装子类对象
+GameObject player = new Player();
+GameObject monster = new Monster();
+GameObject boss = new Boss();
+
+// 多态数组
+GameObject[] objects = new GameObject[]
+{
+    new Player(),
+    new Monster(),
+    new Boss()
+};
+
+// 使用 is 类型检查 + as 安全转换
+if (player is Player)
+{
+    (player as Player).PlayerAtk();   // 调用子类特有方法
+}
+```
+
 
 ---
 
@@ -1873,6 +1873,8 @@ class Test2
 
 **泛型类中的泛型方法**：
 
+> 注意：`Test2` 和 `Test2<T>` 是两个不同的类（C# 允许泛型与非泛型同名共存，因为类型参数数量不同）。上面演示普通类中的泛型方法，这里演示泛型类中的方法。
+
 ```csharp
 class Test2<T>
 {
@@ -1896,12 +1898,12 @@ tt.TestFun<string>("123");      // 方法自己的 K = string
 解决了非泛型集合（如 ArrayList）的两个问题：**类型不安全**（什么都能塞）和**装箱拆箱开销**。用泛型手写一个类型安全的动态数组：
 
 ```csharp
-class Arraylist<T>
+class MyArrayList<T>
 {
     private T[] array;
     private int count;
 
-    public Arraylist()
+    public MyArrayList()
     {
         array = new T[10];
         count = 0;
@@ -1946,69 +1948,69 @@ class Arraylist<T>
 
 ```csharp
 // 值类型约束
-class Test1<T> where T : struct
+class ValueBox<T> where T : struct
 {
     public T Value;
     public void TestFun<K>(K v) where K : struct { }
 }
 
 // 引用类型约束
-class Test2<T> where T : class
+class ReferenceBox<T> where T : class
 {
     public T Value;
     public void TestFun<K>(K v) where K : class { }
 }
 
 // 无参构造函数约束 —— 可以安全 new T()
-class Test3<T> where T : new()
+class NewableBox<T> where T : new()
 {
     public T Value = new T();
 }
 ```
 
 ```csharp
-class Test1 { }                  // 基类
-class Test2
+class Animal { }                 // 基类
+class Dog
 {
-    public Test2(int a) { }      // 只有有参构造
+    public Dog(int age) { }      // 只有有参构造
 }
-class Test3 : Test1 { }          // 继承 Test1
+class Cat : Animal { }           // 继承 Animal
 
-// 基类约束 —— T 必须是 Test1 或其派生类
-class Test4<T> where T : Test1
+// 基类约束 —— T 必须是 Animal 或其派生类
+class AnimalBox<T> where T : Animal
 {
     public T Value;
 }
 
-Test4<Test1> t4 = new Test4<Test1>();
-Test4<Test3> tt4 = new Test4<Test3>();   // Test3 继承 Test1，可以
-//Test4<Test2> t4 = new Test4<Test2>();  // 不行：Test2 与 Test1 无关
+AnimalBox<Animal> box1 = new AnimalBox<Animal>();
+AnimalBox<Cat> box2 = new AnimalBox<Cat>();      // Cat 继承 Animal，可以
+//AnimalBox<Dog> box3 = new AnimalBox<Dog>();    // 不行：Dog 与 Animal 无关
 ```
 
 ```csharp
 interface IFly { }
 interface IMove : IFly { }       // 接口继承接口
-class Test4 : IFly { }           // 实现 IFly
+class Bird : IFly { }            // 实现 IFly
 
 // 接口约束 —— T 必须实现 IFly
-class Test5<T> where T : IFly
+class FlyBox<T> where T : IFly
 {
     public T Value;
 }
 
-Test5<IFly> t5 = new Test5<IFly>();
-t5.Value = new Test4();          // Test4 实现了 IFly，可以
-Test5<IMove> tt5 = new Test5<IMove>();
+FlyBox<IFly> box1 = new FlyBox<IFly>();
+box1.Value = new Bird();         // Bird 实现了 IFly，可以
+FlyBox<IMove> box2 = new FlyBox<IMove>();
 ```
 
 ```csharp
 // 另一个泛型参数约束 —— T 必须是 U 的派生类或实现 U 接口
-class Test6<T, U> where T : U
+class DerivedBox<T, U> where T : U
 {
     public T Value;
 }
 
-Test6<IMove, IFly> t6 = new Test6<IMove, IFly>();
+DerivedBox<IMove, IFly> box = new DerivedBox<IMove, IFly>();
 // IMove 继承自 IFly，满足 T : U
 ```
 
@@ -2016,11 +2018,11 @@ Test6<IMove, IFly> t6 = new Test6<IMove, IFly>();
 
 ```csharp
 // 多个约束组合（用逗号分隔）
-class Test7<T> where T : class, new()   // 必须是引用类型 + 有无参构造
+class CombinedBox<T> where T : class, new()   // 必须是引用类型 + 有无参构造
 { }
 
 // 多个类型参数各自有约束
-class Test8<T, K>
+class MultiBox<T, K>
     where T : class, new()
     where K : struct
 { }
@@ -2030,16 +2032,107 @@ class Test8<T, K>
 
 ```csharp
 // 错误示范：不约束时不能用 new T()
-class Bad<T>
+class UnconstrainedBox<T>
 {
     //public T t = new T();  // 编译错误：无法确定 T 有无无参构造
 }
 
 // 正确：加上 new() 约束后可以
-class Good<T> where T : new()
+class ConstrainedBox<T> where T : new()
 {
     public T t = new T();    // OK
 }
 ```
 
 > **记忆口诀**：`struct` 管值类型，`class` 管引用类型，`new()` 管能构造，基类/接口管继承关系。约束让泛型代码从"什么都能装"变成"符合条件的才能装"。
+
+---
+
+## 十一、常用泛型数据结构类（List\<T\>）
+
+前面学了非泛型集合（ArrayList 等）和泛型。`List<T>` 是**泛型版本的可变数组**，是日常开发中最常用的集合，兼具泛型的类型安全和动态增删能力。位于 `System.Collections.Generic` 命名空间。
+
+### 11.1 List\<T\> 的增删查改
+
+```csharp
+using System.Collections.Generic;
+
+List<int> list = new List<int>();       // 声明时指定元素类型
+List<string> list2 = new List<string>();
+List<bool> list3 = new List<bool>();
+```
+
+**增：**
+
+```csharp
+list.Add(1);                    // 末尾追加
+list.Add(2);
+list.Add(3);
+
+List<string> other = new List<string>();
+other.Add("123");
+list2.AddRange(other);          // 整体追加另一个集合
+
+list.Insert(0, 999);            // 指定位置插入
+```
+
+**删：**
+
+```csharp
+list.Remove(1);                 // 按值删除第一个匹配项
+list.RemoveAt(0);               // 按索引删除
+list.Clear();                   // 清空所有元素
+```
+
+**查：**
+
+```csharp
+Console.WriteLine(list[0]);     // 索引访问
+
+list.Contains(1);               // 是否包含 → bool
+
+int index = list.IndexOf(2);    // 正向查找，返回索引；找不到返回 -1
+int last = list.LastIndexOf(2); // 反向查找
+```
+
+**改：**
+
+```csharp
+list[0] = 99;                   // 索引赋值
+```
+
+**遍历：**
+
+```csharp
+Console.WriteLine(list.Count);      // 元素个数
+Console.WriteLine(list.Capacity);   // 容量（自动扩容）
+
+for (int i = 0; i < list.Count; i++)    // for 遍历
+    Console.WriteLine(list[i]);
+
+foreach (int item in list)              // foreach 遍历
+    Console.WriteLine(item);
+```
+
+### 11.2 List\<T\> vs ArrayList
+
+| | `List<T>`（泛型） | `ArrayList`（非泛型） |
+|---|------|------|
+| **类型安全** | 编译期确定，只能存 T 类型 | 存 `object`，什么都能塞 |
+| **装箱拆箱** | 无（值类型直接存储） | 有（值类型装箱） |
+| **性能** | 快 | 慢（有装箱开销） |
+| **取值** | 直接得到 T，无需强转 | 取出是 `object`，需强转 |
+
+```csharp
+// ArrayList 的痛点
+ArrayList list = new ArrayList();
+list.Add(1);                  // 装箱
+int a = (int)list[0];         // 取出需强转，还可能类型不一致出错
+
+// List<T> 的改进
+List<int> list = new List<int>();
+list.Add(1);                  // 直接存 int，无装箱
+int a = list[0];              // 直接得到 int，无需强转
+```
+
+> 日常开发优先用 `List<T>`。后续的 `Dictionary<K,V>`（键值对）、`Queue<T>`（队列）、`Stack<T>`（栈）也都是对应非泛型版本的泛型替代品。

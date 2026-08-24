@@ -40,10 +40,10 @@
             s1.age = 10;
             s1.sex = false;
             s1.number = 1;
-            s1.name = "kiZz";
+            s1.name = "李四";
             s1.Speak();
 
-            Student s2 = new Student(18,true,2,"kiZoverlxrd");
+            Student s2 = new Student(18,true,2,"王五");
 
         }
     }

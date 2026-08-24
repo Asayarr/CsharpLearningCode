@@ -105,7 +105,7 @@ namespace 贪食蛇
         }
 
         //碰墙撞身体结束逻辑
-        public bool CheakEnd(Map map)
+        public bool CheckEnd(Map map)
         {
             for (int i = 0; i < map.walls.Length; i++)
             {
@@ -126,7 +126,7 @@ namespace 贪食蛇
         }
 
         //吃食物相关
-        public bool CheakSamePos(Position p)
+        public bool CheckSamePos(Position p)
         {
             for (int i = 0; i < nowLength; i++)
             {
@@ -138,7 +138,7 @@ namespace 贪食蛇
             return false;
         }
 
-        public void CheakEatFood(Food food)
+        public void CheckEatFood(Food food)
         {
             if (bodys[0].pos == food.pos)
             {

@@ -71,7 +71,7 @@
 
             (f as Son).SpeakName();
 
-            GameObject p = new Player("kiZz");
+            GameObject p = new Player("李四");
             p.Atk();
 
             GameObject m = new Monster("Bobbynopeace");

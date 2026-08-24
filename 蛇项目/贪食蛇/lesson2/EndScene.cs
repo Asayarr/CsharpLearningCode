@@ -4,15 +4,15 @@ using System.Text;
 
 namespace 贪食蛇
 {
-    internal class EndSence : BeginOrEndBaseScene
+    internal class EndScene : BeginOrEndBaseScene
     {
-        public EndSence()
+        public EndScene()
         {
             title = "游戏结束";
             choiceOne = "回到开始界面";
         }
 
-        public override void EneterJorEnterDoSomething()
+        public override void OnConfirm()
         {
             if (nowSelIndex == 0)
             {

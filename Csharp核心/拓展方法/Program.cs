@@ -5,12 +5,12 @@
     {
         public static void SpeakValue(this int value)
         { 
-            Console.WriteLine("kiz为int拓展的方法"+value);
+            Console.WriteLine("张三为int拓展的方法"+value);
         }
 
         public static void SpeakStringInfo(this string str, string str1, string str2) 
         { 
-            Console.WriteLine("kiz为string拓展的方法");
+            Console.WriteLine("张三为string拓展的方法");
             Console.WriteLine("调用的方法" + str);
             Console.WriteLine("传的参数" + str1 + str2);
         }
@@ -46,7 +46,7 @@
             i.SpeakValue();
 
             string str = "000";
-            str.SpeakStringInfo("kizoverlxrd","SB");
+            str.SpeakStringInfo("王五","SB");
 
             Test t = new Test();
             t.Fun3();

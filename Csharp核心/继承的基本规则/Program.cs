@@ -35,13 +35,13 @@
         {
             Console.WriteLine("继承的基本规则");
             TeachingTeacher tt = new TeachingTeacher();
-            tt.name = "kiZz";
+            tt.name = "李四";
             tt.number = 91;
             tt.subject = "说唱";
             tt.SpeakSubject();
             
             RapTeacher ttr = new RapTeacher();
-            ttr.name = "kizoverlxrd";
+            ttr.name = "王五";
             ttr.subject = "原神";
             ttr.skill();
 

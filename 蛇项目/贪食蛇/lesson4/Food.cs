@@ -24,7 +24,7 @@ namespace 贪食蛇
             int y = r.Next(1, Game.h - 4);
             pos = new Position(x, y);
 
-            if (snake.CheakSamePos(pos))
+            if (snake.CheckSamePos(pos))
             {
                 RandomPos(snake);
             }

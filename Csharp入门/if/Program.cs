@@ -6,18 +6,17 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("你喜欢的说唱歌手是谁");
-        string str =Console.ReadLine();
-        if (str != null && str.Equals("Asen", StringComparison.OrdinalIgnoreCase))
+        Console.WriteLine("请输入你的名字");
+        string str = Console.ReadLine();
+        if (str != null && str.Equals("张三", StringComparison.OrdinalIgnoreCase))
         {
-            Console.WriteLine("阿里嘎多摆锤子");
+            Console.WriteLine("你好，管理员");
 
         }
         else
         {
-            Console.WriteLine("感觉不如kiZz");
+            Console.WriteLine("你好，访客");
         }
-
 
 
 

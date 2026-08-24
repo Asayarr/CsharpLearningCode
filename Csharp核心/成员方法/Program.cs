@@ -38,7 +38,7 @@
         {
             Console.WriteLine("成员方法");
             Person p = new Person();
-            p.name = "kiZz";
+            p.name = "李四";
             p.Speak("楼下的是福瑞");
 
             Person p2 = new Person();

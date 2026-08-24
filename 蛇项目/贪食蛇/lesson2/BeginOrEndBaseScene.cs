@@ -10,7 +10,7 @@ namespace 贪食蛇
         protected string title;
         protected string choiceOne;
 
-        public abstract void EneterJorEnterDoSomething();
+        public abstract void OnConfirm();
 
         public void Update()
         {
@@ -43,7 +43,7 @@ namespace 贪食蛇
                     }
                     break;
                 case ConsoleKey.Enter or ConsoleKey.J:
-                    EneterJorEnterDoSomething();
+                    OnConfirm();
                     break;
 
 

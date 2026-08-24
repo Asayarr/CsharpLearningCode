@@ -11,7 +11,7 @@ namespace 贪食蛇
             title = "贪食蛇";
             choiceOne = "开始游戏";
         }
-        public override void EneterJorEnterDoSomething() 
+        public override void OnConfirm() 
         {
             if (nowSelIndex == 0)
             {

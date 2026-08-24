@@ -66,7 +66,7 @@ namespace 贪食蛇
                     nowScene = new GameScene();
                     break;
                 case E_SceneType.End:
-                    nowScene = new EndSence();
+                    nowScene = new EndScene();
                     break;
 
             }

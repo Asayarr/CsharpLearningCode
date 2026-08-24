@@ -18,7 +18,7 @@
         }
         class Person 
         {
-            public string name = "kiZz";
+            public string name = "李四";
             public int age;
             public E_sexType sex;
             public Person girlfriend;

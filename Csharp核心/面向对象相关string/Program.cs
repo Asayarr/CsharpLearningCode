@@ -40,18 +40,18 @@
             #endregion
 
             #region 知识点五 移除指定位置后的字符
-            str = "我是kizkiz";
-            str = str.Remove(5); // 移除索引 5 及之后的所有字符
-            Console.WriteLine(str); // 输出 "我是kiz"
+            str = "我是张三张三";
+            str = str.Remove(4); // 移除索引 4 及之后的所有字符
+            Console.WriteLine(str); // 输出 "我是张三"
 
-            str = str.Remove(2, 3); // 从索引 2 开始移除 3 个字符
+            str = str.Remove(2, 2); // 从索引 2 开始移除 2 个字符
             Console.WriteLine(str); // 输出 "我是"
             #endregion
 
             #region 知识点六 替换字符串
-            str = "我是kizkiz";
-            str = str.Replace("kiz", "张三"); // 将 "kiz" 替换为 "张三"
-            Console.WriteLine(str); // 输出 "我是张三张三"
+            str = "我是张三张三";
+            str = str.Replace("张三", "李四"); // 将 "张三" 替换为 "李四"
+            Console.WriteLine(str); // 输出 "我是李四李四"
             #endregion
 
             #region 知识点七 大小写转换

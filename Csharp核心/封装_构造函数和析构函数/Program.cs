@@ -9,7 +9,7 @@
             //类中是允许自己申明无参构造函数的
             public Person() //构造函数 不写默认有 函数名与类名一样
             {
-                name = "kiZz";
+                name = "李四";
                 age = 18;
             }
             public Person(string name, int age) : this(age)
@@ -30,7 +30,7 @@
         }
         static void Main(string[] args)
         {
-            Person p =new Person("kizoverlxrd",19);
+            Person p =new Person("王五",19);
             Console.WriteLine(p.name);
 
             p = null;//垃圾回收 C#会自动回收垃圾

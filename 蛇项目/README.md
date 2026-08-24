@@ -67,7 +67,7 @@ dotnet run --project 贪食蛇
     ├── lesson2/              # 菜单场景
     │   ├── BeginOrEndBaseScene.cs  # 菜单基类（抽象类）
     │   ├── StartScene.cs     # 开始界面
-    │   ├── EndSence.cs       # 结束界面
+    │   ├── EndScene.cs       # 结束界面
     │   └── GameScene.cs      # 游戏主场景
     ├── lesson3/              # 游戏对象基础
     │   ├── IDraw.cs          # 绘制接口
@@ -125,9 +125,9 @@ ISceneUpdate (接口)
   │
   ├── BeginOrEndBaseScene (抽象类)
   │     │  [模板方法：Update() 实现菜单绘制 + 输入处理]
-  │     │  [抽象方法：EneterJorEnterDoSomething() — 子类决定确认后的行为]
+  │     │  [抽象方法：OnConfirm() — 子类决定确认后的行为]
   │     ├── StartScene
-  │     └── EndSence
+  │     └── EndScene
   │
   └── GameScene
         │  [持有 Map + Snake + Food]
@@ -184,17 +184,17 @@ class Snake : IDraw
 - 居中绘制第一选项（`choiceOne`）+ 固定第二选项"结束游戏"
 - 红/白高亮当前选中项（`nowSelIndex`）
 - 上下键切换选中项（带边界限制）
-- Enter/J 键触发 `EneterJorEnterDoSomething()`（**模板方法**，由子类实现）
+- Enter/J 键触发 `OnConfirm()`（**模板方法**，由子类实现）
 
 ### StartScene.cs — 开始界面
 
-`EneterJorEnterDoSomething()` 逻辑：
+`OnConfirm()` 逻辑：
 - 选中"开始游戏" → `Game.ChangeScene(E_SceneType.Game)`
 - 选中"结束游戏" → `Environment.Exit(0)`
 
-### EndSence.cs — 结束界面
+### EndScene.cs — 结束界面
 
-`EneterJorEnterDoSomething()` 逻辑：
+`OnConfirm()` 逻辑：
 - 选中"回到开始界面" → `Game.ChangeScene(E_SceneType.Start)`
 - 选中"结束游戏" → `Environment.Exit(0)`
 
@@ -208,8 +208,8 @@ updateIndex % 4444 == 0 时执行一帧：
   2. food.Draw()          — 绘制食物
   3. snake.Move()         — 蛇移动
   4. snake.Draw()         — 绘制蛇
-  5. snake.CheakEnd(map)  — 碰撞检测，撞墙/撞身则切换到 End 场景
-  6. snake.CheakEatFood() — 检测是否吃到食物
+  5. snake.CheckEnd(map)  — 碰撞检测，撞墙/撞身则切换到 End 场景
+  6. snake.CheckEatFood() — 检测是否吃到食物
 ```
 
 帧率控制：`updateIndex % 4444` 是简单的忙等分频。每约 4444 次循环执行一帧（在循环内同时检测键盘输入）。
@@ -267,9 +267,9 @@ walls = new Wall[Game.w + (Game.h - 3) * 2]
 | `Draw()` | 绘制所有身体节点 |
 | `Move()` | 擦尾 → 身体跟随 → 蛇头按方向移动 |
 | `ChangeDir(dir)` | 改方向，过滤同方向和 180° 反转 |
-| `CheakEnd(map)` | 检测是否撞墙（遍历 walls）+ 检测是否撞自己（遍历 bodys[1..]） |
-| `CheakSamePos(p)` | 检测给定位置是否与蛇身任意节点重叠 |
-| `CheakEatFood(food)` | 蛇头与食物重叠 → 食物重新随机 + 蛇增长 |
+| `CheckEnd(map)` | 检测是否撞墙（遍历 walls）+ 检测是否撞自己（遍历 bodys[1..]） |
+| `CheckSamePos(p)` | 检测给定位置是否与蛇身任意节点重叠 |
+| `CheckEatFood(food)` | 蛇头与食物重叠 → 食物重新随机 + 蛇增长 |
 | `AddBody()` | 在尾部追加一节蛇身（私有方法） |
 
 
@@ -301,7 +301,7 @@ walls = new Wall[Game.w + (Game.h - 3) * 2]
 ```csharp
 x = Random.Range(2, w/2 - 1) * 2;   // 偶数，对齐网格
 y = Random.Range(1, h - 4);          // 避开墙壁区域
-if (snake.CheakSamePos(pos))
+if (snake.CheckSamePos(pos))
     RandomPos(snake);                // 递归重试直到不重叠
 ```
 
@@ -318,9 +318,9 @@ if (snake.CheakSamePos(pos))
 |------|------|------|
 | **接口** | `ISceneUpdate`, `IDraw` | 定义场景更新和绘制契约 |
 | **抽象类** | `GameObject`, `BeginOrEndBaseScene` | 定义公共字段和模板方法，强制子类实现 |
-| **继承** | `Wall/Food/SnakeBody → GameObject`、`StartScene/EndSence → BeginOrEndBaseScene` | 代码复用和层级分类 |
+| **继承** | `Wall/Food/SnakeBody → GameObject`、`StartScene/EndScene → BeginOrEndBaseScene` | 代码复用和层级分类 |
 | **多态** | `ISceneUpdate.Update()`, `IDraw.Draw()` | 父类/接口引用调用子类实现 |
-| **模板方法** | `BeginOrEndBaseScene.Update()` → `EneterJorEnterDoSomething()` | 骨架在父类，步骤由子类填充 |
+| **模板方法** | `BeginOrEndBaseScene.Update()` → `OnConfirm()` | 骨架在父类，步骤由子类填充 |
 | **结构体** | `Position` | 值类型，栈分配，赋值独立副本 |
 | **运算符重载** | `Position.==`, `Position.!=` | 比较两个坐标是否相同 |
 | **枚举** | `E_SceneType`, `E_MoveDir`, `E_SnakeBodyType` | 给状态/方向/类型赋予语义名称 |
