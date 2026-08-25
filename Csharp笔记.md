@@ -543,7 +543,7 @@ newArray[newArray.Length - 1] = 6;
 array = newArray;  // 指向新数组
 ```
 
-### 3.5 选择排序
+### 3.5 数组算法：选择排序
 
 经典排序算法：每一轮找到未排序部分的最大（小）值，放到已排序位置。
 
@@ -2048,7 +2048,7 @@ class ConstrainedBox<T> where T : new()
 
 ---
 
-## 十一、常用泛型数据结构类（List\<T\>）
+## 十一、常用泛型数据结构类（List\<T\> / Dictionary\<K,V\>）
 
 前面学了非泛型集合（ArrayList 等）和泛型。`List<T>` 是**泛型版本的可变数组**，是日常开发中最常用的集合，兼具泛型的类型安全和动态增删能力。位于 `System.Collections.Generic` 命名空间。
 
@@ -2136,3 +2136,200 @@ int a = list[0];              // 直接得到 int，无需强转
 ```
 
 > 日常开发优先用 `List<T>`。后续的 `Dictionary<K,V>`（键值对）、`Queue<T>`（队列）、`Stack<T>`（栈）也都是对应非泛型版本的泛型替代品。
+
+### 11.3 Dictionary\<K, V\>（泛型键值对）
+
+`Dictionary<K, V>` 是 `Hashtable` 的泛型版本，以**键值对**存储，**key 唯一、value 可重复**。声明时指定 key 和 value 的类型，无需装箱拆箱和强转。
+
+```csharp
+Dictionary<int, string> dictionary = new Dictionary<int, string>();
+```
+
+**增删查改：**
+
+```csharp
+// 增
+dictionary.Add(1, "123");
+dictionary.Add(2, "222");
+dictionary.Add(3, "222");        // value 可以重复
+
+// 删
+dictionary.Remove(1);            // 按 key 删除
+dictionary.Remove(4);            // 删除不存在的 key 不会报错
+dictionary.Clear();              // 清空
+
+// 查 —— 通过 key 取值
+Console.WriteLine(dictionary[2]);    // "222"
+Console.WriteLine(dictionary[1]);    // "123"
+
+dictionary.ContainsKey(1);           // 按 key 判断是否存在
+dictionary.ContainsValue("222");     // 按 value 判断是否存在
+
+// 改 —— 只能改 value，不能改 key
+dictionary[3] = "555";
+Console.WriteLine(dictionary[3]);    // "555"
+```
+
+**遍历（三种方式）：**
+
+```csharp
+Console.WriteLine(dictionary.Count);     // 键值对个数
+
+// 1. 遍历 key（通过 key 取 value）
+foreach (int item in dictionary.Keys)
+    Console.WriteLine(item + ":" + dictionary[item]);
+
+// 2. 遍历 value
+foreach (string item in dictionary.Values)
+    Console.WriteLine(item);
+
+// 3. 遍历键值对（KeyValuePair<K,V> 结构体）
+foreach (KeyValuePair<int, string> item in dictionary)
+    Console.WriteLine("键:" + item.Key + "；值:" + item.Value);
+```
+
+> `Dictionary<K,V>` 与 `Hashtable` 的关系，等同于 `List<T>` 与 `ArrayList`：前者类型安全、无装箱、性能更好，日常开发优先用泛型版。
+
+
+---
+
+## 十二、顺序存储和链式存储
+
+数据在内存中存储的两种基本方式，决定了增删查改的性能差异。
+
+### 12.1 顺序存储（数组）
+
+元素**连续**存放在内存中，通过下标直接访问。
+
+```
+内存地址:  [0]  [1]  [2]  [3]  [4]
+           ┌────┬────┬────┬────┬────┐
+           │ 10 │ 20 │ 30 │ 40 │ 50 │
+           └────┴────┴────┴────┴────┘
+```
+
+- **查/改快**：`arr[2]` 直接按下标跳转，O(1)
+- **增/删慢**：中间插入/删除要移动后面的所有元素，O(n)
+
+```csharp
+int[] array = { 10, 20, 30, 40, 50 };
+Console.WriteLine(array[2]);    // 30 —— 下标直达，快
+
+// 中间插入：后面的元素全部后移
+// [10][20][30][40][50] → [10][99][20][30][40][50]
+```
+
+### 12.2 链式存储（链表）
+
+元素**分散**在内存中，每个节点（Node）记录自己的值 + 下一个节点的位置（引用），用"链"串起来。
+
+```
+head                                          tail
+ │                                             │
+ ▼                                             ▼
+┌──────┬────┐   ┌──────┬────┐   ┌──────┬────┐   ┌──────┬────┐
+│ 值:10│ ●──┼──>│ 值:20│ ●──┼──>│ 值:30│ ●──┼──>│ 值:40│ ●──┼──> null
+└──────┴────┘   └──────┴────┘   └──────┴────┘   └──────┴────┘
+  Node            Node            Node            Node
+```
+
+**节点结构：**
+
+```csharp
+class LinkedNode<T>
+{
+    public T value;                 // 当前节点的值
+    public LinkedNode<T> NextNode;  // 记录下一个节点的位置
+
+    public LinkedNode(T value)
+    {
+        this.value = value;
+    }
+}
+```
+
+**链表管理类：**
+
+```csharp
+class LinkedList<T>
+{
+    public LinkedNode<T> head;   // 头节点
+    public LinkedNode<T> tail;   // 尾节点
+
+    // 添加 —— 新节点挂到尾部
+    public void Add(T value)
+    {
+        LinkedNode<T> node = new LinkedNode<T>(value);
+        if (head == null)        // 链表为空
+        {
+            head = node;
+            tail = node;
+        }
+        else
+        {
+            tail.NextNode = node;   // 原尾节点指向新节点
+            tail = node;            // 更新尾节点
+        }
+    }
+
+    // 删除 —— 断开中间节点
+    public void Remove(T value)
+    {
+        if (head == null)
+            return;
+        else if (head.value.Equals(value))   // 删除头节点
+        {
+            head = head.NextNode;
+            if (head == null)                // 只有一个节点，删完链表空了
+                tail = null;
+            return;
+        }
+
+        LinkedNode<T> node = head;
+        while (node.NextNode != null)        // 遍历找目标
+        {
+            if (node.NextNode.value.Equals(value))
+            {
+                node.NextNode = node.NextNode.NextNode;  // 跳过目标节点
+                break;
+            }
+            node = node.NextNode;
+        }
+    }
+}
+```
+
+**使用：**
+
+```csharp
+LinkedList<int> link = new LinkedList<int>();
+link.Add(1);
+link.Add(2);
+link.Add(3);
+
+// 遍历 —— 只能从头节点开始逐个访问
+LinkedNode<int> node = link.head;
+while (node != null)
+{
+    Console.WriteLine(node.value);
+    node = node.NextNode;
+}
+```
+
+### 12.3 两种存储方式对比
+
+| | 顺序存储（数组） | 链式存储（链表） |
+|---|------|------|
+| **内存布局** | 连续 | 分散，靠引用连接 |
+| **查/改** | 快：下标直达 O(1) | 慢：必须从头遍历 O(n) |
+| **增/删** | 慢：需要移动元素 O(n) | 快：改引用即可 O(1) |
+| **空间** | 需要连续大块内存 | 每个节点多存一个引用，略占空间 |
+
+```csharp
+// 增：链式优于顺序（中间插入时链式不用移动位置）
+// 删：链式优于顺序（中间删除时链式不用移动位置）
+// 查：顺序优于链式（数组下标直达，链表要遍历）
+// 改：顺序优于链式（数组下标直达，链表要遍历）
+```
+
+> **总结**：频繁查改用数组（List\<T\>），频繁中间增删用链表（LinkedList\<T\>，但 .NET 自带的 LinkedList\<T\> 是双向链表）。
