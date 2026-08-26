@@ -7,4 +7,11 @@
   <Project Path="结构体/结构体.csproj" Id="564ff9b0-e8a6-4d66-b247-af59d5667aee" />
   <Project Path="选择排序/选择排序.csproj" Id="6d47283b-5dfe-47c0-9640-c4dd2b647ab7" />
   <Project Path="递归函数/递归函数.csproj" Id="fb8bd4df-e683-492a-8e32-686a1e899c9f" />
+  <Project Path="二维数组/二维数组.csproj" Id="ad663949-2039-433d-a18f-a3084a06aa38" />
+  <Project Path="交错数组/交错数组.csproj" Id="bb301951-f91e-4f0e-9fc0-ebb49e0a7146" />
+  <Project Path="特殊的引用类型string/特殊的引用类型string.csproj" Id="164860d5-0770-4cfb-beee-0014c57eeca5" />
+  <Project Path="函数/函数.csproj" Id="d6e78641-ee9d-4539-b693-33be1e967cf2" />
+  <Project Path="ref和out/ref和out.csproj" Id="dceda09e-5d1d-4246-b225-b09229e2647e" />
+  <Project Path="函数重载/函数重载.csproj" Id="9ff3a783-b0f4-4968-9837-059414c88f20" />
+  <Project Path="冒泡排序/冒泡排序.csproj" Id="4d6a0fbc-abf9-4de3-9c73-3bede5e83123" />
 </Solution>

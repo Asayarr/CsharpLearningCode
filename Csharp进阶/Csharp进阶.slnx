@@ -3,9 +3,11 @@
   <Project Path="HashTable/HashTable.csproj" Id="8db42196-f3a2-4b79-86a4-677623718b91" />
   <Project Path="Queues/Queues.csproj" />
   <Project Path="Stacks/Stacks.csproj" />
+  <Project Path="常用泛型数据结构类LinkedList/常用泛型数据结构类LinkedList.csproj" Id="7c6aa803-fdeb-4e97-a6a6-efa3ad720d9b" />
   <Project Path="常用泛型数据结构类_List/常用泛型数据结构类_List.csproj" Id="ace22dc0-dba8-4860-8e0d-1c2860fa5adb" />
   <Project Path="常用泛型类数据结构类Dictionary/常用泛型类数据结构类Dictionary.csproj" Id="24eddb3a-e46e-4436-a0b2-ef1459c74a1a" />
   <Project Path="泛型/泛型.csproj" Id="becd129b-b2d8-4d91-ad35-ee25328d93d1" />
+  <Project Path="泛型栈和队列/泛型栈和队列.csproj" Id="bec8b4e3-e420-4a6a-918e-0fcea9ddbead" />
   <Project Path="泛型约束/泛型约束.csproj" Id="c758628b-5b0a-42a2-b379-56a68c8af029" />
   <Project Path="顺序存储和链式存储/顺序存储和链式存储.csproj" Id="f40722f1-0740-450f-aab0-c3204a4d24a5" />
 </Solution>

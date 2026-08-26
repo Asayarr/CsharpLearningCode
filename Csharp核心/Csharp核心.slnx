@@ -24,4 +24,5 @@
   <Project Path="命名空间/命名空间.csproj" Id="105c75cf-e2d8-44d0-89df-fe2a705cbf47" />
   <Project Path="密封方法/密封方法.csproj" Id="f870b6ed-94ac-4254-8439-aa6afb51d5b9" />
   <Project Path="面向对象相关string/面向对象相关string.csproj" Id="8e5d4928-f595-47f3-947f-510cbadcfa80" />
+  <Project Path="D:/document/Csharp/Csharp核心/类和对象/类和对象.csproj" Id="625567ac-2b2e-4886-85db-6f79389a5aa3" />
 </Solution>

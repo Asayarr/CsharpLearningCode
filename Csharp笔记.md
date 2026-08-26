@@ -502,7 +502,72 @@ arr2 = new int[] { 1, 2, 3, 4 };
 Console.WriteLine(arr[0]);  // 999，arr 不受影响
 ```
 
-### 3.4 数组
+### 3.4 特殊的引用类型 string
+
+**string 是引用类型，但用起来像值类型：**
+
+```csharp
+string str1 = "hello";
+string str2 = str1;       // 复制的是引用
+Console.WriteLine(str1 == str2);   // True（内容相等）
+
+str2 = "world";           // str2 指向新的字符串对象
+Console.WriteLine(str1);  // hello（str1 不受影响）
+```
+
+**不可变性：** 字符串内容不可变！任何"修改"都是创建新对象。
+
+```csharp
+string s = "abc";
+s = s + "def";            // 实际是创建新对象"abcdef"，s 指向它
+Console.WriteLine(s);
+```
+
+**字符串驻留（常量池）：** 编译期确定的相同内容字符串指向同一对象。
+
+```csharp
+string a = "hello";
+string b = "hello";
+Console.WriteLine(ReferenceEquals(a, b));   // True（常量池同一个）
+
+string d = "hel";
+string e = d + "lo";              // 运行时拼接 → 新对象
+Console.WriteLine(ReferenceEquals(a, e));   // False
+```
+
+**比较：`==` 和 `Equals` 比较内容，`ReferenceEquals` 比较引用：**
+
+```csharp
+string x = "abc";
+string y = "ab" + "c";
+Console.WriteLine(x == y);                 // True（内容相等）
+Console.WriteLine(x.Equals(y));            // True（内容相等）
+Console.WriteLine(ReferenceEquals(x, y));  // True（常量池同一个）
+
+// 忽略大小写比较
+string m = "Hello";
+string n = "hello";
+Console.WriteLine(m.Equals(n, StringComparison.OrdinalIgnoreCase));  // True
+```
+
+**与 char 数组互转：**
+
+```csharp
+string str = "hello";
+char[] chars = str.ToCharArray();   // string → char[]
+Console.WriteLine(chars[0]);        // 'h'
+
+string newStr = new string(chars);  // char[] → string
+Console.WriteLine(newStr);          // hello
+```
+
+> 重点：字符串 `==` 比较的是**内容**（编译器特殊处理），而普通引用类型 `==` 默认比较引用。string 的不可变性让"修改"字符串实际是换新对象，频繁拼接用 `StringBuilder`（见 3.2）。
+
+### 3.5 数组
+
+数组按**维度**可分为一维数组、二维数组、交错数组三种：
+
+#### 3.5.I 一维数组
 
 数组是定长的同类型元素集合。声明时必须指定类型，长度确定后不可变。
 
@@ -543,30 +608,96 @@ newArray[newArray.Length - 1] = 6;
 array = newArray;  // 指向新数组
 ```
 
-### 3.5 数组算法：选择排序
+#### 3.5.II 二维数组
 
-经典排序算法：每一轮找到未排序部分的最大（小）值，放到已排序位置。
+二维数组是**两个下标**的数组（表格：行、列）。声明时同时指定行数和列数。
+
+**四种声明方式：**
 
 ```csharp
-int[] arr = new int[] { 8, 7, 1, 5, 6, 2, 4, 3, 9 };
+int[,] arr1 = new int[2, 3];                    // 2行3列，元素默认0
+int[,] arr2 = new int[2, 3] { { 1, 2, 3 }, { 4, 5, 6 } };   // 声明并初始化
+int[,] arr3 = new int[,] { { 1, 2 }, { 3, 4 }, { 5, 6 } };  // 由初始化列表推断
+int[,] arr4 = { { 1, 2, 3 }, { 4, 5, 6 } };                // 最简写法
+```
 
-for (int j = 0; j < arr.Length; j++)
+**访问与遍历：**
+
+```csharp
+// 通过 [行, 列] 访问
+Console.WriteLine(arr2[0, 0]);   // 1（第0行第0列）
+Console.WriteLine(arr2[1, 2]);   // 6（第1行第2列）
+arr2[1, 1] = 99;                 // 修改
+
+// 获取各维度长度
+Console.WriteLine(arr2.GetLength(0));   // 2（行数）
+Console.WriteLine(arr2.GetLength(1));   // 3（列数）
+
+// 遍历方式1：两层 for 循环（外层行、内层列）
+for (int i = 0; i < arr2.GetLength(0); i++)
 {
-    int index = 0;
-    for (int i = 1; i < arr.Length - j; i++)
+    for (int j = 0; j < arr2.GetLength(1); j++)
     {
-        if (arr[index] < arr[i])
-            index = i;     // 找到最大值的位置
+        Console.Write(arr2[i, j] + " ");
     }
-    // 将最大值交换到当前未排序部分的末尾
-    if (index != arr.Length - 1 - j)
-    {
-        int temp = arr[index];
-        arr[index] = arr[arr.Length - 1 - j];
-        arr[arr.Length - 1 - j] = temp;
-    }
+    Console.WriteLine();
+}
+
+// 遍历方式2：foreach 按行优先顺序遍历所有元素
+foreach (int item in arr2)
+    Console.Write(item + " ");
+```
+
+#### 3.5.III 交错数组
+
+交错数组（锯齿数组）是**数组的数组**：每个"行"是一个独立的数组，**每行的长度可以不同**。
+
+```csharp
+// 声明：先指定行数，每行再各自 new
+int[][] arr1 = new int[3][];
+arr1[0] = new int[2];          // 第0行 2 个元素
+arr1[1] = new int[4];          // 第1行 4 个元素
+arr1[2] = new int[3];          // 第2行 3 个元素
+
+// 声明并初始化
+int[][] arr2 = new int[][]
+{
+    new int[] { 1, 2 },
+    new int[] { 3, 4, 5 },
+    new int[] { 6, 7, 8, 9 }
+};
+```
+
+**访问与遍历：**
+
+```csharp
+// 通过 [行][列] 访问（注意与二维数组 [,] 的写法区别）
+Console.WriteLine(arr2[0][0]);   // 1
+Console.WriteLine(arr2[1][2]);   // 5
+arr2[2][1] = 99;
+
+// 长度：Length 是行数，每行有自己的 Length
+Console.WriteLine(arr2.Length);       // 3（行数）
+Console.WriteLine(arr2[0].Length);    // 2（第0行元素个数）
+
+// 遍历：外层遍历行，内层遍历当前行
+for (int i = 0; i < arr2.Length; i++)
+{
+    for (int j = 0; j < arr2[i].Length; j++)
+        Console.Write(arr2[i][j] + " ");
+    Console.WriteLine();
+}
+
+// foreach
+foreach (int[] row in arr2)
+{
+    foreach (int item in row)
+        Console.Write(item + " ");
+    Console.WriteLine();
 }
 ```
+
+> **二维数组 vs 交错数组**：二维数组 `int[,]` 是矩形（每行列数相同），用 `[行,列]` 和 `GetLength()`；交错数组 `int[][]` 是锯齿形（每行可不同长度），用 `[行][列]` 和 `Length`。
 
 ### 3.6 枚举
 
@@ -693,27 +824,209 @@ Console.WriteLine(c1.X);  // 100 — c1 被修改
 
 ---
 
-## 四、方法与函数
+## 四、排序算法
 
-### 4.1 成员方法
+### 4.1 选择排序
 
-方法定义在类中，包含访问修饰符、返回类型、方法名、参数列表和方法体。
+经典排序算法：每一轮找到未排序部分的最大（小）值，放到已排序位置。
 
 ```csharp
-public void Speak(string str)
-{
-    Console.WriteLine("{0}说：{1}", name, str);
-}
+int[] arr = new int[] { 8, 7, 1, 5, 6, 2, 4, 3, 9 };
 
-public bool IsAdult()
+for (int j = 0; j < arr.Length; j++)
 {
-    return age >= 18;
+    int index = 0;
+    for (int i = 1; i < arr.Length - j; i++)
+    {
+        if (arr[index] < arr[i])
+            index = i;     // 找到最大值的位置
+    }
+    // 将最大值交换到当前未排序部分的末尾
+    if (index != arr.Length - 1 - j)
+    {
+        int temp = arr[index];
+        arr[index] = arr[arr.Length - 1 - j];
+        arr[arr.Length - 1 - j] = temp;
+    }
 }
-
-// 方法返回值为 void 表示不返回任何东西
 ```
 
-### 4.2 变长参数与默认值
+### 4.2 冒泡排序
+
+经典排序算法：**相邻元素两两比较，大的往后移（升序）**，每一轮把当前未排序部分的最大值"冒泡"到末尾。
+
+```csharp
+int[] arr = new int[] { 8, 7, 1, 5, 6, 2, 4, 3, 9 };
+
+// 外层：共 n-1 轮
+for (int i = 0; i < arr.Length - 1; i++)
+{
+    // 内层：相邻比较，把最大的移到末尾
+    // 每轮结束，末尾 i+1 个元素已排好序，无需再比较
+    for (int j = 0; j < arr.Length - 1 - i; j++)
+    {
+        if (arr[j] > arr[j + 1])
+        {
+            // 交换相邻元素
+            int temp = arr[j];
+            arr[j] = arr[j + 1];
+            arr[j + 1] = temp;
+        }
+    }
+}
+```
+
+## 五、方法与函数
+
+### 5.1 函数
+
+**概念：**
+
+函数（方法）是执行特定任务的代码块，通过函数名调用。定义在类中称为**成员方法**，定义在 `Program` 里配合 `static` 使用。
+
+**语法结构：**
+
+```
+访问修饰符 + 返回类型 + 函数名(参数列表) { 函数体 }
+```
+
+```csharp
+// 无参无返回值
+static void SayHello()
+{
+    Console.WriteLine("你好");
+}
+
+// 有参无返回值
+static void SayHi(string name)
+{
+    Console.WriteLine("你好，" + name);
+}
+
+// 无参有返回值
+static int GetTen()
+{
+    return 10;
+}
+
+// 有参有返回值
+static int Add(int a, int b)
+{
+    return a + b;
+}
+
+// 返回值为 void 表示不返回任何东西
+```
+
+**调用：**
+
+```csharp
+SayHello();                    // 你好
+SayHi("李四");                  // 你好，李四
+int sum = Add(3, 5);           // 8
+```
+
+**参数传递方式：**
+
+```csharp
+// 值类型参数：传的是值的副本，函数内修改不影响外部
+int num = 10;
+ChangeNum(num);
+Console.WriteLine(num);        // 10（不受影响）
+
+static void ChangeNum(int x)
+{
+    x = 999;
+}
+
+// 引用类型参数：传的是引用，函数内修改会影响外部
+int[] arr = { 1, 2, 3 };
+ChangeArr(arr);
+Console.WriteLine(arr[0]);     // 99（被修改）
+
+static void ChangeArr(int[] a)
+{
+    a[0] = 99;
+}
+```
+
+> 值类型传副本、引用类型传引用，是理解函数参数的核心。
+
+### 5.2 ref 和 out
+
+**ref（按引用传递，双向）：** 函数内修改会反映到外部。**使用前必须先初始化**。
+
+```csharp
+static void AddOne(ref int num)
+{
+    num += 1;
+}
+
+static void Swap(ref int a, ref int b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int num = 10;
+AddOne(ref num);       // 调用时也要写 ref
+Console.WriteLine(num); // 11（被修改）
+
+int x = 3, y = 5;
+Swap(ref x, ref y);
+Console.WriteLine(x);  // 5
+Console.WriteLine(y);  // 3
+```
+
+**out（只出不进，单向）：** 函数必须给 out 参数赋值。**使用前不用初始化**。
+
+```csharp
+// out 常用于"尝试解析"模式：返回是否成功 + 结果
+static bool TryParseInt(string str, out int result)
+{
+    result = 0;
+    try
+    {
+        result = int.Parse(str);
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+if (TryParseInt("123", out int r))
+{
+    Console.WriteLine("解析成功：" + r);
+}
+else
+{
+    Console.WriteLine("解析失败");
+}
+
+// out 可以"一次性返回多个值"
+static void GetMinMax(int[] arr, out int min, out int max)
+{
+    min = arr[0];
+    max = arr[0];
+    for (int i = 1; i < arr.Length; i++)
+    {
+        if (arr[i] < min) min = arr[i];
+        if (arr[i] > max) max = arr[i];
+    }
+}
+
+int[] nums = { 3, 1, 4, 1, 5, 9, 2, 6 };
+GetMinMax(nums, out int min, out int max);
+Console.WriteLine("最小值：" + min);   // 1
+Console.WriteLine("最大值：" + max);   // 9
+```
+
+> **ref vs out**：`ref` 双向（进可传值、出可带值），调用前必须初始化；`out` 只出不进，调用前不用初始化，函数内必须赋值。共同点：都是按引用传递，函数内修改影响外部。
+
+### 5.3 变长参数与默认值
 
 **默认参数值**：给参数指定默认值，调用时可省略。
 
@@ -737,7 +1050,41 @@ void TestFun(params int[] array)
 TestFun(1, 2, 3, 4, 5);  // 传入任意多个参数
 ```
 
-### 4.3 递归函数
+### 5.4 函数重载
+
+**概念：** 函数名相同，**参数列表不同**（个数、类型、顺序不同）。编译器根据实参自动匹配对应版本。
+
+```csharp
+static int Add(int a, int b)
+{
+    return a + b;
+}
+
+static int Add(int a, int b, int c)   // 参数个数不同
+{
+    return a + b + c;
+}
+
+static float Add(float a, float b)    // 参数类型不同
+{
+    return a + b;
+}
+
+static string Add(string a, string b) // 参数类型不同
+{
+    return a + b;
+}
+
+// 调用：编译器自动匹配
+int r1 = Add(1, 2);                // 匹配两个 int → 3
+int r2 = Add(1, 2, 3);             // 匹配三个 int → 6
+float r3 = Add(1.5f, 2.5f);        // 匹配两个 float → 4
+string r4 = Add("hello", "world"); // 匹配两个 string → helloworld
+```
+
+> **重载只看参数列表，与返回类型无关**——只改返回类型不叫重载（编译错误）。
+
+### 5.5 递归函数
 
 函数内部调用自身。必须包含**终止条件**，否则会无限递归导致栈溢出。
 
@@ -759,7 +1106,7 @@ int Fib(int n)
 }
 ```
 
-### 4.4 拓展方法
+### 5.6 拓展方法
 
 在不修改原类型代码的情况下，为已有类型"添加"新方法。**必须定义在静态类中**，第一个参数用 `this` 指定要拓展的类型。
 
@@ -795,11 +1142,11 @@ s.PrintInfo("world");              // 字符串：hello，信息：world
 
 ---
 
-## 五、命名空间
+## 六、命名空间
 
 命名空间用于组织和管理代码，避免类名冲突。类似文件系统中的文件夹。
 
-### 5.1 基本使用
+### 6.1 基本使用
 
 ```csharp
 // 声明命名空间
@@ -817,7 +1164,7 @@ GameObject g = new GameObject();
 Player p = new Player();
 ```
 
-### 5.2 同名类的处理
+### 6.2 同名类的处理
 
 - 同一命名空间不能有同名类
 - 不同命名空间可以有同名类
@@ -843,7 +1190,7 @@ MyGame.GameObject g1 = new MyGame.GameObject();   // 明确指定
 MyGame2.GameObject g2 = new MyGame2.GameObject();
 ```
 
-### 5.3 嵌套命名空间
+### 6.3 嵌套命名空间
 
 命名空间可以包含子命名空间，用 `.` 分隔访问。
 
@@ -870,7 +1217,7 @@ Image gameImage = new Image();    // 歧义！需用全限定名
 MyGame.Game.Image img = new MyGame.Game.Image();
 ```
 
-### 5.4 命名空间中类的访问修饰符
+### 6.4 命名空间中类的访问修饰符
 
 | 可用修饰符 | 不可用修饰符 |
 |-----------|-------------|
@@ -884,13 +1231,53 @@ MyGame.Game.Image img = new MyGame.Game.Image();
 
 ---
 
-## 六、面向对象编程
+## 七、面向对象编程
 
-### 6.1 类与对象、成员变量、访问修饰符
+### 7.1 类与对象、成员变量、访问修饰符
 
-类是对象的模板，通过 `new` 创建实例。成员变量（字段）存储在类的实例中。
+**概念：**
+
+类是对象的模板（图纸），通过 `new` 创建实例（对象）。成员变量（字段）存储在类的实例中。
+
+```csharp
+// 类的定义：类是对象的模板
+class Student
+{
+    public string name;    // 成员变量（字段）
+    public int age;
+    public bool sex;
+
+    // 成员方法
+    public void SayHello()
+    {
+        Console.WriteLine("大家好，我叫" + name);
+    }
+}
+
+// 创建对象（实例化）
+Student s1 = new Student();
+Student s2 = new Student();
+
+// 给成员变量赋值
+s1.name = "张三";
+s1.age = 18;
+
+// 调用成员方法
+s1.SayHello();    // 大家好，我叫张三
+```
 
 **默认值**：数值类型默认 `0`，`bool` 默认 `false`，引用类型默认 `null`。
+
+**对象是引用类型：**
+
+```csharp
+// 对象变量存的是引用，赋值是共享同一对象
+Student s3 = s1;
+s3.age = 99;
+Console.WriteLine(s1.age);   // 99（s1 和 s3 指向同一对象）
+```
+
+**访问修饰符：**
 
 | 访问修饰符 | 含义 |
 |-----------|------|
@@ -910,7 +1297,7 @@ class Person
 }
 ```
 
-### 6.2 构造函数与析构函数
+### 7.2 构造函数与析构函数
 
 构造函数在 `new` 创建对象时自动调用，用于初始化对象。构造函数名与类名相同，无返回类型。
 
@@ -951,7 +1338,7 @@ Person p = new Person();
 p = null;   // 原对象成为垃圾，等待 GC 回收
 ```
 
-### 6.3 成员属性
+### 7.3 成员属性
 
 属性是字段的封装，通过 `get`/`set` 访问器控制读写，可以在访问时添加验证或处理逻辑。
 
@@ -989,7 +1376,7 @@ public int Age { get; private set; }           // 外部只读
 public float Height { get; private set; }      // 外部只读
 ```
 
-### 6.4 静态成员与静态类
+### 7.4 静态成员与静态类
 
 `static` 成员属于类本身，不属于任何实例。通过 `类名.成员` 访问。
 
@@ -1027,7 +1414,7 @@ static class StaticClass
 
 > 普通类也可以有静态构造函数：在首次实例化或访问静态成员时自动调用一次。
 
-### 6.5 索引器
+### 7.5 索引器
 
 让对象能像数组一样用 `[]` 语法访问数据。
 
@@ -1075,7 +1462,7 @@ Console.WriteLine(p[0]);     // 调用 int 索引器 get
 Console.WriteLine(p["name"]); // 调用 string 索引器 get
 ```
 
-### 6.6 继承基本规则
+### 7.6 继承基本规则
 
 C# 只支持**单继承**（一个类只能继承一个父类），但可以**多层继承**。子类获得父类所有 `public` 和 `protected` 成员。
 
@@ -1113,7 +1500,7 @@ class RapTeacher : TeachingTeacher
 }
 ```
 
-### 6.7 继承中的构造函数
+### 7.7 继承中的构造函数
 
 创建子类对象时，构造函数从顶层父类开始逐级向下执行。如果父类没有无参构造函数，子类必须用 `base()` 显式调用父类构造函数。
 
@@ -1159,7 +1546,7 @@ class Son : Father
 }
 ```
 
-### 6.8 密封类
+### 7.8 密封类
 
 `sealed` 修饰的类**不能被继承**。
 
@@ -1169,7 +1556,7 @@ sealed class Father { }
 // class Son : Father { }   // 编译错误：无法继承密封类
 ```
 
-### 6.9 抽象类与抽象方法
+### 7.9 抽象类与抽象方法
 
 `abstract` 类不能实例化，只能被继承。抽象方法没有方法体，子类必须用 `override` 实现。
 
@@ -1199,7 +1586,7 @@ Fruits f = new Apple();      // 正确：通过父类引用子类对象
 - 不能是 `private`
 - 没有方法体（只有声明）
 
-### 6.10 多态
+### 7.10 多态
 
 多态允许父类引用调用子类重写的方法，运行时决定具体调用哪个版本。
 
@@ -1247,7 +1634,7 @@ f.SpeakName();            // 输出："Father的方法"（父类引用调父类�
 
 > `new` 只是隐藏，不是覆盖。父类引用仍然调用父类方法。只有 `virtual + override` 才是真正的运行时多态。
 
-### 6.11 接口
+### 7.11 接口
 
 接口声明了一组功能契约，实现接口的类必须实现其中所有成员。接口不能有成员变量和方法实现。
 
@@ -1313,7 +1700,7 @@ Player p = new Player();
 
 > 显式实现用于两个接口有同名方法时区分调用。调用时必须转换为对应接口类型。
 
-### 6.12 抽象类与接口的区别
+### 7.12 抽象类与接口的区别
 
 | | 抽象类（`abstract class`） | 接口（`interface`） |
 |---|------|------|
@@ -1359,7 +1746,7 @@ class Duck : Animal, IFly, ISwim
 
 > 选择原则：当多个类共享代码和字段 → 抽象类；当多个不相关的类需要相同行为 → 接口。
 
-### 6.13 内部类与分部类
+### 7.13 内部类与分部类
 
 **内部类（嵌套类）**：类定义在另一个类的内部。用 `OuterClass.InnerClass` 访问。
 
@@ -1397,7 +1784,7 @@ partial class Student
 }
 ```
 
-### 6.14 密封方法
+### 7.14 密封方法
 
 `sealed override` 阻止子类进一步重写已被 `override` 的方法。
 
@@ -1428,7 +1815,7 @@ class WhitePerson : Person
 }
 // WhitePerson 的子类无法再 override Eat 和 Speak
 ```
-### 6.15 万物之父与装箱拆箱
+### 7.15 万物之父与装箱拆箱
 
 `object` 是所有类型的基类（C# 中一切皆派生自 `object`）。
 
@@ -1465,7 +1852,7 @@ if (o is Son)
 }
 ```
 
-### 6.16 万物之父中的方法
+### 7.16 万物之父中的方法
 
 `object` 类提供了三类方法：静态方法、成员方法、虚方法。
 
@@ -1548,14 +1935,18 @@ Console.WriteLine(t);          // 输出：原神牛逼（隐式调用 ToString(
 
 ---
 
-## 七、设计原则
+## 八、设计原则
 
-### 7.1 里氏替换原则（LSP）
+### 8.1 里氏替换原则（LSP）
 
 核心思想：**父类容器可以装子类对象**，子类可以替换父类出现的位置，且程序行为不变。
 
+**为什么需要 LSP：**
+
+LSP 是**多态的前提**。多态允许"父类引用调用子类方法"，但要保证替换后程序行为一致，子类不能破坏父类定义的规则。如果子类随意改变行为语义，父类容器调用时就会出现意外结果。
+
 ```csharp
-// 父类容器装子类对象
+// 正例：父类容器装子类对象
 GameObject player = new Player();
 GameObject monster = new Monster();
 GameObject boss = new Boss();
@@ -1575,12 +1966,44 @@ if (player is Player)
 }
 ```
 
+**反例（违反 LSP）：**
+
+子类重写时**破坏父类约定的行为语义**，父类容器调用时抛异常/结果错误。
+
+```csharp
+class GameObject
+{
+    public virtual void Move()
+    {
+        Console.WriteLine("物体移动");
+    }
+}
+
+// 违反 LSP：Wall 不是"会移动的物体"，却强行继承 Move
+class Wall : GameObject
+{
+    public override void Move()
+    {
+        throw new Exception("墙不能移动！");   // 破坏了父类的行为约定
+    }
+}
+
+// 父类容器统一调用 —— Wall 抛异常，程序崩溃
+GameObject[] objects = { new Player(), new Wall() };
+foreach (GameObject obj in objects)
+{
+    obj.Move();   // Player 正常，Wall 抛异常 → 违反 LSP
+}
+```
+
+> **如何避免**：子类只能扩展（加新行为），不能破坏父类的行为语义。Wall 不应该继承 GameObject 的 Move——把 Move 抽到子类各自的接口/抽象类里，而不是让"不能动的物体"硬实现 Move。
+
 
 ---
 
-## 八、高级特性
+## 九、高级特性
 
-### 8.1 运算符重载
+### 9.1 运算符重载
 
 通过 `operator` 关键字为自定义类型定义运算符行为。必须是 `public static` 方法。
 
@@ -1609,193 +2032,6 @@ Point p2 = new Point { X = 3, Y = 4 };
 Point p3 = p1 + p2;     // X=4, Y=6
 Point p4 = p1 + 5;      // X=6, Y=7
 ```
-
----
-
-## 九、集合（System.Collections）
-
-集合类位于 `System.Collections` 命名空间（需 `using System.Collections;`）。这些是非泛型集合，可以存放**任意类型**的元素（内部存 `object`），所以取出来时要拆箱/强转。
-
-### 9.1 ArrayList（可变数组）
-
-解决了普通数组**长度固定**的问题：可以动态增删，长度自动变化。
-
-```csharp
-using System.Collections;
-
-ArrayList array = new ArrayList();
-
-// 增 —— 可以放任意类型
-array.Add(1);
-array.Add("123");
-array.Add(true);
-array.Add(new Test());       // 自定义类也可以
-
-ArrayList array2 = new ArrayList();
-array2.Add(123);
-array.AddRange(array2);      // 把另一个集合整体追加进来
-
-array.Insert(1, "插入的元素"); // 指定位置插入
-
-// 删
-array.Remove(1);             // 从头删除第一个值为1的元素
-array.RemoveAt(2);           // 删除指定索引的元素
-//array.Clear();             // 清空所有元素
-
-// 查
-Console.WriteLine(array[0]);          // 索引访问
-array.Contains("123");                // 是否包含某元素 → bool
-int index = array.IndexOf(true);      // 正向查找，返回索引；找不到返回 -1
-int lastIndex = array.LastIndexOf(true); // 反向查找
-
-// 改
-array[0] = "999";            // 索引赋值
-
-// 遍历
-for (int i = 0; i < array.Count; i++)   // Count = 元素个数（不是 Length）
-    Console.WriteLine(array[i]);
-
-foreach (object item in array)          // 遍历出来都是 object
-    Console.WriteLine(item);
-```
-
-> 与数组对比：数组用 `Length`，ArrayList 用 `Count`。ArrayList 存的是 `object`，取出使用时可能需要类型转换。
-
-### 9.2 Hashtable（哈希表）
-
-以**键值对（key-value）**形式存储，类似字典。**key 唯一，value 可以重复**。
-
-```csharp
-using System.Collections;
-
-Hashtable hashtable = new Hashtable();
-
-// 增 —— key 和 value 都可以是任意类型
-hashtable.Add(1, "123");
-hashtable.Add("123", 2);
-hashtable.Add(true, false);
-
-// 删
-hashtable.Remove(1);         // 只能通过 key 删除
-hashtable.Remove(2);         // 删除不存在的 key 不会报错
-hashtable.Clear();           // 清空
-
-// 查 —— 通过 key 取值，找不到返回 null
-Console.WriteLine(hashtable[1]);
-Console.WriteLine(hashtable[4]);        // null
-
-hashtable.Contains(1);                 // 按 key 判断是否存在
-hashtable.ContainsKey(2);              // 等价写法
-hashtable.ContainsValue("123");        // 按 value 判断是否存在
-
-// 改 —— 只能改 value，不能改 key
-hashtable[1] = 100.5f;
-
-// 遍历
-Console.WriteLine(hashtable.Count);    // 键值对个数
-
-// 1. 遍历 key
-foreach (object key in hashtable.Keys)
-    Console.WriteLine("键:" + key + " 值:" + hashtable[key]);
-
-// 2. 遍历 value
-foreach (object value in hashtable.Values)
-    Console.WriteLine("值:" + value);
-
-// 3. 遍历键值对（DictionaryEntry 是键值对结构体）
-foreach (DictionaryEntry item in hashtable)
-    Console.WriteLine("键:" + item.Key + ", 值:" + item.Value);
-
-// 4. 迭代器遍历
-IDictionaryEnumerator myEnumerator = hashtable.GetEnumerator();
-while (myEnumerator.MoveNext())
-    Console.WriteLine("键:" + myEnumerator.Key + ", 值:" + myEnumerator.Value);
-```
-
-### 9.3 Queue（队列）
-
-**先进先出（FIFO）**。就像排队：先来的先走。只能从队首取、队尾进。
-
-```csharp
-using System.Collections;
-
-Queue queue = new Queue();
-
-// 增 —— 入队（队尾）
-queue.Enqueue(1);
-queue.Enqueue("123");
-queue.Enqueue(1.4f);
-
-// 取 —— 出队（队首），取出后元素被移除
-object v = queue.Dequeue();
-Console.WriteLine(v);        // 1
-
-// 查
-v = queue.Peek();            // 只看队首，不移除
-queue.Contains("123");       // 是否包含某元素
-
-// 改
-// 队列不支持直接修改元素，要先 Dequeue 出来，改完再 Enqueue 回去
-queue.Clear();               // 清空
-
-// 遍历
-foreach (object item in queue)
-    Console.WriteLine(item);
-
-object[] array = queue.ToArray();   // 转成数组
-
-while (queue.Count > 0)             // 边取边删，直到取空
-    Console.WriteLine(queue.Dequeue());
-```
-
-> 队列只关心两端的操作，中间的元素不能直接访问。
-
-### 9.4 Stack（栈）
-
-**后进先出（LIFO）**。就像叠盘子：最后放的先拿。只能从栈顶存取。
-
-```csharp
-using System.Collections;
-
-Stack stack = new Stack();
-
-// 增 —— 入栈（压到栈顶）
-stack.Push(1);
-stack.Push("123");
-stack.Push(true);
-
-// 取 —— 出栈（弹栈顶），取出后元素被移除
-object v = stack.Pop();
-Console.WriteLine(v);        // true（最后放的先出来）
-
-// 查
-v = stack.Peek();            // 只看栈顶，不移除
-stack.Contains("123");       // 是否包含某元素
-
-// 改
-// 栈中的元素无法直接修改，也没有索引器，不能用 for 循环遍历
-stack.Clear();               // 清空
-
-// 遍历
-foreach (object item in stack)       // foreach 从栈顶开始
-    Console.WriteLine(item);
-
-object[] arr = stack.ToArray();      // 转成数组
-
-while (stack.Count > 0)
-    Console.WriteLine(stack.Pop());
-```
-
-### 9.5 四者对比
-
-| 集合 | 结构 | 顺序 | 增删位置 | 特点 |
-|------|------|------|----------|------|
-| `ArrayList` | 动态数组 | 插入顺序 | 任意位置 | 可动态增删、可索引访问 |
-| `Hashtable` | 键值对 | 无序 | 按 key | key 唯一，查找快 |
-| `Queue` | 队列 | FIFO | 队尾进、队首出 | 先进先出 |
-| `Stack` | 栈 | LIFO | 栈顶进出 | 后进先出 |
-
-> 这些是非泛型集合，存取的是 `object`（有装箱/拆箱开销）。泛型版本 `List<T>`、`Dictionary<K,V>`、`Queue<T>`、`Stack<T>` 类型安全且性能更好，是日常开发的首选。
 
 ---
 
@@ -2048,11 +2284,204 @@ class ConstrainedBox<T> where T : new()
 
 ---
 
-## 十一、常用泛型数据结构类（List\<T\> / Dictionary\<K,V\>）
+## 十一、集合
 
-前面学了非泛型集合（ArrayList 等）和泛型。`List<T>` 是**泛型版本的可变数组**，是日常开发中最常用的集合，兼具泛型的类型安全和动态增删能力。位于 `System.Collections.Generic` 命名空间。
+集合类是存放一组数据的容器。分为**非泛型集合**（`System.Collections`，存 `object`）和**泛型集合**（`System.Collections.Generic`，类型安全）两类。先学非泛型理解概念，再学泛型版本——泛型版本是日常开发首选。
 
-### 11.1 List\<T\> 的增删查改
+### 11.1 非泛型集合（System.Collections）
+
+#### 11.1.I ArrayList（可变数组）
+
+
+解决了普通数组**长度固定**的问题：可以动态增删，长度自动变化。
+
+```csharp
+using System.Collections;
+
+ArrayList array = new ArrayList();
+
+// 增 —— 可以放任意类型
+array.Add(1);
+array.Add("123");
+array.Add(true);
+array.Add(new Test());       // 自定义类也可以
+
+ArrayList array2 = new ArrayList();
+array2.Add(123);
+array.AddRange(array2);      // 把另一个集合整体追加进来
+
+array.Insert(1, "插入的元素"); // 指定位置插入
+
+// 删
+array.Remove(1);             // 从头删除第一个值为1的元素
+array.RemoveAt(2);           // 删除指定索引的元素
+//array.Clear();             // 清空所有元素
+
+// 查
+Console.WriteLine(array[0]);          // 索引访问
+array.Contains("123");                // 是否包含某元素 → bool
+int index = array.IndexOf(true);      // 正向查找，返回索引；找不到返回 -1
+int lastIndex = array.LastIndexOf(true); // 反向查找
+
+// 改
+array[0] = "999";            // 索引赋值
+
+// 遍历
+for (int i = 0; i < array.Count; i++)   // Count = 元素个数（不是 Length）
+    Console.WriteLine(array[i]);
+
+foreach (object item in array)          // 遍历出来都是 object
+    Console.WriteLine(item);
+```
+
+> 与数组对比：数组用 `Length`，ArrayList 用 `Count`。ArrayList 存的是 `object`，取出使用时可能需要类型转换。
+
+#### 11.1.II Hashtable（哈希表）
+
+
+以**键值对（key-value）**形式存储，类似字典。**key 唯一，value 可以重复**。
+
+```csharp
+using System.Collections;
+
+Hashtable hashtable = new Hashtable();
+
+// 增 —— key 和 value 都可以是任意类型
+hashtable.Add(1, "123");
+hashtable.Add("123", 2);
+hashtable.Add(true, false);
+
+// 删
+hashtable.Remove(1);         // 只能通过 key 删除
+hashtable.Remove(2);         // 删除不存在的 key 不会报错
+hashtable.Clear();           // 清空
+
+// 查 —— 通过 key 取值，找不到返回 null
+Console.WriteLine(hashtable[1]);
+Console.WriteLine(hashtable[4]);        // null
+
+hashtable.Contains(1);                 // 按 key 判断是否存在
+hashtable.ContainsKey(2);              // 等价写法
+hashtable.ContainsValue("123");        // 按 value 判断是否存在
+
+// 改 —— 只能改 value，不能改 key
+hashtable[1] = 100.5f;
+
+// 遍历
+Console.WriteLine(hashtable.Count);    // 键值对个数
+
+// 1. 遍历 key
+foreach (object key in hashtable.Keys)
+    Console.WriteLine("键:" + key + " 值:" + hashtable[key]);
+
+// 2. 遍历 value
+foreach (object value in hashtable.Values)
+    Console.WriteLine("值:" + value);
+
+// 3. 遍历键值对（DictionaryEntry 是键值对结构体）
+foreach (DictionaryEntry item in hashtable)
+    Console.WriteLine("键:" + item.Key + ", 值:" + item.Value);
+
+// 4. 迭代器遍历
+IDictionaryEnumerator myEnumerator = hashtable.GetEnumerator();
+while (myEnumerator.MoveNext())
+    Console.WriteLine("键:" + myEnumerator.Key + ", 值:" + myEnumerator.Value);
+```
+
+#### 11.1.III Queue（队列）
+
+
+**先进先出（FIFO）**。就像排队：先来的先走。只能从队首取、队尾进。
+
+```csharp
+using System.Collections;
+
+Queue queue = new Queue();
+
+// 增 —— 入队（队尾）
+queue.Enqueue(1);
+queue.Enqueue("123");
+queue.Enqueue(1.4f);
+
+// 取 —— 出队（队首），取出后元素被移除
+object v = queue.Dequeue();
+Console.WriteLine(v);        // 1
+
+// 查
+v = queue.Peek();            // 只看队首，不移除
+queue.Contains("123");       // 是否包含某元素
+
+// 改
+// 队列不支持直接修改元素，要先 Dequeue 出来，改完再 Enqueue 回去
+queue.Clear();               // 清空
+
+// 遍历
+foreach (object item in queue)
+    Console.WriteLine(item);
+
+object[] array = queue.ToArray();   // 转成数组
+
+while (queue.Count > 0)             // 边取边删，直到取空
+    Console.WriteLine(queue.Dequeue());
+```
+
+> 队列只关心两端的操作，中间的元素不能直接访问。
+
+#### 11.1.IV Stack（栈）
+
+
+**后进先出（LIFO）**。就像叠盘子：最后放的先拿。只能从栈顶存取。
+
+```csharp
+using System.Collections;
+
+Stack stack = new Stack();
+
+// 增 —— 入栈（压到栈顶）
+stack.Push(1);
+stack.Push("123");
+stack.Push(true);
+
+// 取 —— 出栈（弹栈顶），取出后元素被移除
+object v = stack.Pop();
+Console.WriteLine(v);        // true（最后放的先出来）
+
+// 查
+v = stack.Peek();            // 只看栈顶，不移除
+stack.Contains("123");       // 是否包含某元素
+
+// 改
+// 栈中的元素无法直接修改，也没有索引器，不能用 for 循环遍历
+stack.Clear();               // 清空
+
+// 遍历
+foreach (object item in stack)       // foreach 从栈顶开始
+    Console.WriteLine(item);
+
+object[] arr = stack.ToArray();      // 转成数组
+
+while (stack.Count > 0)
+    Console.WriteLine(stack.Pop());
+```
+
+#### 11.1.V 四者对比
+
+
+| 集合 | 结构 | 顺序 | 增删位置 | 特点 |
+|------|------|------|----------|------|
+| `ArrayList` | 动态数组 | 插入顺序 | 任意位置 | 可动态增删、可索引访问 |
+| `Hashtable` | 键值对 | 无序 | 按 key | key 唯一，查找快 |
+| `Queue` | 队列 | FIFO | 队尾进、队首出 | 先进先出 |
+| `Stack` | 栈 | LIFO | 栈顶进出 | 后进先出 |
+
+> 这些是非泛型集合，存取的是 `object`（有装箱/拆箱开销）。泛型版本 `List<T>`、`Dictionary<K,V>`、`Queue<T>`、`Stack<T>` 类型安全且性能更好，是日常开发的首选。
+
+---
+
+### 11.2 泛型集合（System.Collections.Generic）
+
+#### 11.2.I List\<T\> 的增删查改
+
 
 ```csharp
 using System.Collections.Generic;
@@ -2114,7 +2543,8 @@ foreach (int item in list)              // foreach 遍历
     Console.WriteLine(item);
 ```
 
-### 11.2 List\<T\> vs ArrayList
+#### 11.2.II List\<T\> vs ArrayList
+
 
 | | `List<T>`（泛型） | `ArrayList`（非泛型） |
 |---|------|------|
@@ -2137,7 +2567,8 @@ int a = list[0];              // 直接得到 int，无需强转
 
 > 日常开发优先用 `List<T>`。后续的 `Dictionary<K,V>`（键值对）、`Queue<T>`（队列）、`Stack<T>`（栈）也都是对应非泛型版本的泛型替代品。
 
-### 11.3 Dictionary\<K, V\>（泛型键值对）
+#### 11.2.III Dictionary\<K, V\>（泛型键值对）
+
 
 `Dictionary<K, V>` 是 `Hashtable` 的泛型版本，以**键值对**存储，**key 唯一、value 可重复**。声明时指定 key 和 value 的类型，无需装箱拆箱和强转。
 
@@ -2189,6 +2620,250 @@ foreach (KeyValuePair<int, string> item in dictionary)
 ```
 
 > `Dictionary<K,V>` 与 `Hashtable` 的关系，等同于 `List<T>` 与 `ArrayList`：前者类型安全、无装箱、性能更好，日常开发优先用泛型版。
+
+#### 11.2.IV LinkedList\<T\>（双向链表）
+
+
+**概念与原理：**
+
+`LinkedList<T>` 是 .NET 内置的**双向链表**，位于 `System.Collections.Generic`。与第十二章手写的单向链表不同，它的每个节点 `LinkedListNode<T>` 同时记录**前一个节点**和**后一个节点**两个引用：
+
+```
+                 ┌────┐   ┌────┐   ┌────┐
+   null ◄─────── │ 10 │ ◄─│ 20 │ ◄─│ 30 │ ◄─────── null
+                 │    │───>│    │───>│    │
+                 └────┘   └────┘   └────┘
+                 First              Last
+```
+
+- **双向**：既能从头往尾走（`Next`），也能从尾往头走（`Previous`）
+- **没有索引器**：不能 `list[2]` 按下标访问，只能从头部/尾部遍历
+- **增删快**：中间插入/删除只改节点引用，不需要移动元素（O(1)）
+- **查改慢**：查找必须从头/尾遍历（O(n)）
+
+**创建：**
+
+```csharp
+LinkedList<int> linkedList = new LinkedList<int>();
+```
+
+**增（四种方式）：**
+
+| 方法 | 说明 |
+|------|------|
+| `AddFirst(value)` | 在头部添加 |
+| `AddLast(value)` | 在尾部添加 |
+| `AddAfter(node, value)` | 在指定节点**之后**插入 |
+| `AddBefore(node, value)` | 在指定节点**之前**插入 |
+
+```csharp
+linkedList.AddLast(10);             // [10]
+linkedList.AddFirst(20);            // [20, 10]
+linkedList.AddLast(30);             // [20, 10, 30]
+
+// 在指定节点前后插入 —— 先 Find 定位到节点
+LinkedListNode<int> node = linkedList.Find(10);
+linkedList.AddAfter(node, 15);      // [20, 10, 15, 30]
+linkedList.AddBefore(node, 12);     // [20, 12, 10, 15, 30]
+```
+
+**删：**
+
+| 方法 | 说明 |
+|------|------|
+| `RemoveFirst()` | 删除头节点 |
+| `RemoveLast()` | 删除尾节点 |
+| `Remove(value)` | 按值删除第一个匹配节点 |
+| `Remove(node)` | 删除指定节点 |
+| `Clear()` | 清空所有节点 |
+
+```csharp
+linkedList.RemoveFirst();           // 删除头部
+linkedList.RemoveLast();            // 删除尾部
+linkedList.Remove(12);              // 按值删除
+linkedList.Clear();                 // 清空
+```
+
+**查：**
+
+| 成员 | 说明 |
+|------|------|
+| `First` | 头节点（`LinkedListNode<T>`） |
+| `Last` | 尾节点（`LinkedListNode<T>`） |
+| `Find(value)` | 按值从头查找节点，找不到返回 `null` |
+| `FindLast(value)` | 按值从尾查找节点 |
+| `Contains(value)` | 是否包含 → bool |
+| `Count` | 节点个数 |
+
+```csharp
+LinkedListNode<int> first = linkedList.First;   // 头节点
+LinkedListNode<int> last = linkedList.Last;     // 尾节点
+
+LinkedListNode<int> node = linkedList.Find(3);  // 按值查找
+Console.WriteLine(node.Value);                  // 3
+
+linkedList.Contains(1);             // true/false
+```
+
+**改（通过节点改值）：**
+
+```csharp
+Console.WriteLine(linkedList.First.Value);   // 1
+linkedList.First.Value = 10;                 // 修改节点值
+Console.WriteLine(linkedList.First.Value);   // 10
+```
+
+> 链表没有索引器，**改也只能通过节点**（`First.Value` / `Find(...).Value`），不能 `linkedList[0] = x`。
+
+**遍历（三种方式）：**
+
+```csharp
+// 1. foreach 直接遍历值
+foreach (int item in linkedList)
+    Console.WriteLine(item);
+
+// 2. 从头到尾：用 Next 逐个走
+LinkedListNode<int> node = linkedList.First;
+while (node != null)
+{
+    Console.WriteLine(node.Value);
+    node = node.Next;
+}
+
+// 3. 从尾到头：用 Previous（双向链表的独有能力）
+node = linkedList.Last;
+while (node != null)
+{
+    Console.WriteLine(node.Value);
+    node = node.Previous;
+}
+```
+
+**LinkedList\<T\> vs List\<T\>：**
+
+| | `List<T>`（动态数组） | `LinkedList<T>`（双向链表） |
+|---|------|------|
+| **底层** | 连续数组（顺序存储） | 分散节点（链式存储） |
+| **下标访问** | `list[2]` 直接访问 O(1) | 不支持索引器 |
+| **中间插入/删除** | 慢：移动元素 O(n) | 快：只改引用 O(1) |
+| **内存** | 连续空间，可能扩容拷贝 | 每节点多存前后两个引用 |
+| **适用** | 频繁按下标查改 | 频繁在中间增删 |
+
+> **选择原则**：需要下标访问、频繁查改 → `List<T>`；频繁在头部/中间插入删除 → `LinkedList<T>`。
+
+#### 11.2.V 泛型 Stack\<T\>
+
+**概念与原理：**
+
+第十一章 11.1 学过非泛型 `Stack`（后进先出 LIFO）。泛型版本 `Stack<T>` 结构、规则、API 完全一样，只是**声明时指定元素类型**，不再存 `object`，避免了装箱拆箱和强转。
+
+```
+Stack<T>（后进先出 LIFO，像叠盘子）
+    ┌───┐
+    │ 3 │ ← 栈顶（最后进，最先出）
+    ├───┤
+    │ 2 │
+    ├───┤
+    │ 1 │ ← 栈底
+    └───┘
+```
+
+**API：**
+
+| 方法 | 说明 |
+|------|------|
+| `Push(value)` | 入栈（压到栈顶） |
+| `Pop()` | 出栈（弹出栈顶，元素被移除） |
+| `Peek()` | 只看栈顶，不移除 |
+| `Contains(value)` | 是否包含 → bool |
+| `Clear()` | 清空 |
+| `Count` | 元素个数 |
+| `ToArray()` | 转成数组 |
+
+```csharp
+Stack<int> stack = new Stack<int>();
+
+stack.Push(1);                  // [1]
+stack.Push(2);                  // [1, 2]
+stack.Push(3);                  // [1, 2, 3]
+
+int top = stack.Pop();          // 3（最后进的先出）
+Console.WriteLine(top);
+
+top = stack.Peek();             // 2（只看不移除）
+stack.Contains(2);              // true
+stack.Count;                    // 2
+```
+
+> 栈的典型场景：撤销操作（Ctrl+Z 的记录栈）、函数调用栈、浏览器的后退历史。
+
+#### 11.2.VI 泛型 Queue\<T\>
+
+**概念与原理：**
+
+第十一章 11.1 学过非泛型 `Queue`（先进先出 FIFO）。泛型版本 `Queue<T>` 结构、规则、API 完全一样，只是**声明时指定元素类型**，不再存 `object`，避免了装箱拆箱和强转。
+
+```
+Queue<T>（先进先出 FIFO，像排队）
+    ┌───┐
+    │ 1 │ ← 队首（最先出）
+    ├───┤
+    │ 2 │
+    ├───┤
+    │ 3 │ ← 队尾（最后进）
+    └───┘
+```
+
+**API：**
+
+| 方法 | 说明 |
+|------|------|
+| `Enqueue(value)` | 入队（加到队尾） |
+| `Dequeue()` | 出队（取队首，元素被移除） |
+| `Peek()` | 只看队首，不移除 |
+| `Contains(value)` | 是否包含 → bool |
+| `Clear()` | 清空 |
+| `Count` | 元素个数 |
+| `ToArray()` | 转成数组 |
+
+```csharp
+Queue<int> queue = new Queue<int>();
+
+queue.Enqueue(1);               // [1]
+queue.Enqueue(2);               // [1, 2]
+queue.Enqueue(3);               // [1, 2, 3]
+
+int head = queue.Dequeue();     // 1（先来的先出）
+Console.WriteLine(head);
+
+head = queue.Peek();            // 2（只看不移除）
+queue.Contains(2);              // true
+queue.Count;                    // 2
+```
+
+> 队列的典型场景：消息队列、任务调度、打印机任务排队、游戏匹配排队。
+
+**泛型 vs 非泛型：**
+
+| | `Stack<T>` / `Queue<T>` | `Stack` / `Queue` |
+|---|------|------|
+| **类型安全** | 只能存 T 类型，编译期检查 | 存 `object`，什么都能塞 |
+| **装箱拆箱** | 无 | 值类型有装箱开销 |
+| **取值** | 直接得到 T | 需强转 |
+
+```csharp
+// 非泛型：装箱 + 强转
+Stack stack = new Stack();
+stack.Push(1);
+int a = (int)stack.Pop();
+
+// 泛型：直接存取，无装箱无强转
+Stack<int> stack2 = new Stack<int>();
+stack2.Push(1);
+int b = stack2.Pop();
+```
+
+> 日常开发直接用泛型版本 `Stack<T>` / `Queue<T>`。
 
 
 ---
