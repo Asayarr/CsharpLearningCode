@@ -47,5 +47,5 @@ Csharp/
 ## 环境
 
 - **语言**：C# 10.0 / .NET 10.0
-- **IDE**：Visual Studio 2022
+- **IDE**：Visual Studio 2026 Insiders
 - 每个子目录是一个独立的 `.csproj` 项目
