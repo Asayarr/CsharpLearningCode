@@ -23,7 +23,7 @@ Csharp/
 | **入门** | `Csharp入门/` | 控制台输入输出、变量与数据类型、常量、转义字符、类型转换、算术/逻辑/位/三目运算符、if/switch、while/for、异常处理、字符串拼接、随机数 |
 | **基础** | `Csharp基础/` | 值类型 vs 引用类型、特殊 string、数组（一维/二维/交错）、选择/冒泡排序、枚举、结构体、递归函数、函数（ref/out/重载/变长参数） |
 | **核心** | `Csharp核心/` | 类与对象、封装（构造函数/属性/索引器/静态）、继承、多态、抽象类、接口、密封、命名空间、object 方法、StringBuilder、字符串操作、运算符重载、内部类/分部类、拓展方法 |
-| **进阶** | `Csharp进阶/` | 非泛型集合：ArrayList、Hashtable、Queue、Stack；泛型与泛型约束；List\<T\>、Dictionary\<K,V\>、LinkedList\<T\>、泛型栈队列；顺序存储与链式存储 |
+| **进阶** | `Csharp进阶/` | 非泛型集合：ArrayList、Hashtable、Queue、Stack；泛型与泛型约束；List\<T\>、Dictionary\<K,V\>、LinkedList\<T\>、泛型栈队列；顺序存储与链式存储；委托 delegate |
 | **练习** | `练习题/` | 20 道练习题（猜数字、敏感词过滤、数组去重等），含参考答案 |
 | **综合** | `蛇项目/` | 贪吃蛇游戏 — 综合运用面向对象知识 |
 
@@ -39,7 +39,7 @@ Csharp/
 6. 命名空间
 7. 面向对象编程（含抽象类与接口的区别）
 8. 设计原则（里氏替换、装箱拆箱、object 方法）
-9. 高级特性
+9. 高级特性（运算符重载、委托 delegate）
 10. 泛型（含泛型约束）
 11. 集合（非泛型 ArrayList/Hashtable/Queue/Stack + 泛型 List/Dictionary/LinkedList/Stack\<T\>/Queue\<T\>）
 12. 顺序存储和链式存储（链表）

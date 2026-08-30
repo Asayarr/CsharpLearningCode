@@ -2033,6 +2033,127 @@ Point p3 = p1 + p2;     // X=4, Y=6
 Point p4 = p1 + 5;      // X=6, Y=7
 ```
 
+### 9.2 委托（delegate）
+
+**概念：**
+
+委托是**函数的容器**，本质是一个类（`delegate` 关键字声明）。它定义了一种"函数规则"（参数和返回值），用来装载符合规则的方法，实现**把函数当参数传递**。
+
+```csharp
+// 声明委托：定义规则（这里只是规则，还没有装载函数）
+delegate void MyFun();              // 装载无参无返回值函数
+delegate int MyFun2(int a);         // 装载返回int、有一个int参数函数
+
+// 委托支持泛型：返回值和参数可变
+delegate T MyFun3<T, K>(T t, K k);
+```
+
+**声明规则：**
+
+- 可以声明在 `namespace` 或 `class` 中，更多声明在 `namespace` 中
+- 访问修饰符默认 `public`
+- 同一语句块中不能声明重名委托
+
+**实例化与调用：**
+
+```csharp
+static void Fun() { Console.WriteLine("张三做什么"); }
+static int Fun2(int value) { return value; }
+
+// 方式1：new 委托名(函数名)
+MyFun f = new MyFun(Fun);
+f.Invoke();              // 张三做什么
+
+// 方式2：直接赋值（语法糖）
+MyFun f2 = Fun;
+f2();                    // 直接调用
+
+// 带参数和返回值的委托
+MyFun2 f3 = Fun2;
+Console.WriteLine(f3(1));   // 1
+```
+
+**委托的两种用法：**
+
+```csharp
+class Test
+{
+    // 1. 作为类的成员
+    public MyFun fun;
+    public MyFun2 fun2;
+
+    // 2. 作为函数的参数 —— 先处理自己的逻辑，再执行传入的函数
+    public void TestFun(MyFun fun, MyFun2 fun2)
+    {
+        int i = 1;
+        i *= 2;
+        i += 2;
+        this.fun = fun;    // 存起来
+        this.fun2 = fun2;
+    }
+
+    // 增加 / 移除委托（多播）
+    public void AddFun(MyFun fun, MyFun2 fun2)
+    {
+        this.fun += fun;
+        this.fun2 = fun2;
+    }
+    public void RemoveFun(MyFun fun, MyFun2 fun2)
+    {
+        this.fun -= fun;
+        this.fun2 -= fun2;
+    }
+}
+```
+
+**多播委托（+= 装多个函数）：**
+
+```csharp
+static void Fun()  { Console.WriteLine("张三做什么"); }
+static void Fun3() { Console.WriteLine("李四做什么"); }
+
+MyFun ff = Fun;
+
+ff += Fun3;      // 增：装入第二个函数
+ff();            // 依次输出：张三做什么 / 李四做什么
+
+ff -= Fun;       // 减：移除一个函数
+ff -= Fun;       // 多减不会报错（无非就是没有可减的）
+ff();            // 只输出：李四做什么
+
+ff = null;       // 清空所有
+// ff();         // 清空后调用会报错（null 引用）
+if (ff != null)  // 调用前先判空
+{
+    ff();
+}
+```
+
+**系统内置委托（Action / Func）：**
+
+不用自己声明，直接用 .NET 自带的委托（需 `using System;`）：
+
+| 委托 | 说明 |
+|------|------|
+| `Action` | 无参无返回值 |
+| `Action<T1, T2, ...>` | 可传 n 个参数，无返回值 |
+| `Func<TResult>` | 无参有返回值 |
+| `Func<T1, T2, ..., TResult>` | 可传 n 个参数，有返回值（最后一个泛型是返回值） |
+
+```csharp
+Action action = Fun;              // 无参无返回值
+action += Fun3;
+action();                          // 张三做什么 / 李四做什么
+
+Action<int, string> action2 = Fun6;   // 两个参数，无返回值
+
+Func<string> funcString = Fun4;   // 无参，返回 string
+Func<int> funcInt = Fun5;         // 无参，返回 int
+Func<int, int> funInt2 = Fun2;    // 一个 int 参数，返回 int
+```
+
+> **适用场景**：委托常用于回调（把"做完事后要执行的方法"传给函数）、事件、以及解耦（调用方不需要知道具体方法是谁）。日常开发优先用系统委托 `Action` / `Func`，不必自己声明。
+
 ---
 
 ## 十、泛型
